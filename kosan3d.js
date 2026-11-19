@@ -2,7 +2,7 @@
   'use strict';
 
   var STATUS_META = {
-    occupied: { label: 'Terisi', color: 0x1e4a3b, hex: '#173028', badgeClass: 'status-occupied', pinClass: 'pin-occupied' },
+    occupied: { label: 'Terisi', color: 0x1e4a3b, hex: '#1e4a3b', badgeClass: 'status-occupied', pinClass: 'pin-occupied' },
     ready: { label: 'Kosong siap huni', color: 0x2b6f53, hex: '#2b6f53', badgeClass: 'status-ready', pinClass: 'pin-ready' },
     booked: { label: 'Dalam tahap pemesanan', color: 0xc68621, hex: '#c68621', badgeClass: 'status-booked', pinClass: 'pin-booked' },
     repair: { label: 'Sedang diperbaiki', color: 0xc4542d, hex: '#c4542d', badgeClass: 'status-repair', pinClass: 'pin-repair' }
@@ -17,7 +17,7 @@
     { id: 'K-203', floor: 2, x: 3.2, y: 2.75, z: 0.2 }
   ];
 
-  function createCanvasLabelTexture(drawFn, w, h) {
+  function createCanvasTexture(drawFn, w, h, repeatX, repeatY) {
     var canvas = document.createElement('canvas');
     canvas.width = w;
     canvas.height = h;
@@ -25,44 +25,124 @@
     drawFn(ctx, w, h);
     var tex = new global.THREE.CanvasTexture(canvas);
     tex.encoding = global.THREE.sRGBEncoding;
+    if (repeatX && repeatY) {
+      tex.wrapS = global.THREE.RepeatWrapping;
+      tex.wrapT = global.THREE.RepeatWrapping;
+      tex.repeat.set(repeatX, repeatY);
+    }
     tex.needsUpdate = true;
     return tex;
   }
 
-  function createSignTexture() {
-    return createCanvasLabelTexture(function (ctx, w, h) {
-      ctx.fillStyle = '#173028';
+  function createBrickTexture() {
+    return createCanvasTexture(function (ctx, w, h) {
+      ctx.fillStyle = '#c9bdb0';
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = '#d8a24a';
-      ctx.lineWidth = 6;
-      ctx.strokeRect(6, 6, w - 12, h - 12);
-      ctx.fillStyle = '#fcfaf5';
+      var rows = 8;
+      var cols = 4;
+      var bh = h / rows;
+      var bw = w / cols;
+      var tones = ['#b84b27', '#c4542d', '#ad4422', '#cf6038'];
+      for (var r = 0; r < rows; r++) {
+        var offset = (r % 2) * (bw * 0.5);
+        for (var c = -1; c <= cols; c++) {
+          ctx.fillStyle = tones[(r * 3 + c + 4) % tones.length];
+          ctx.fillRect(c * bw + offset + 3, r * bh + 3, bw - 6, bh - 6);
+        }
+      }
+    }, 256, 256, 2, 3);
+  }
+
+  function createWoodTexture() {
+    return createCanvasTexture(function (ctx, w, h) {
+      ctx.fillStyle = '#9c6b43';
+      ctx.fillRect(0, 0, w, h);
+      var planks = 6;
+      var ph = h / planks;
+      for (var i = 0; i < planks; i++) {
+        ctx.fillStyle = i % 2 === 0 ? '#a6744b' : '#93623c';
+        ctx.fillRect(0, i * ph + 1, w, ph - 2);
+        ctx.fillStyle = 'rgba(55, 32, 14, 0.14)';
+        for (var g = 0; g < 6; g++) {
+          ctx.fillRect(0, i * ph + 6 + g * 6, w, 1.5);
+        }
+      }
+    }, 256, 256, 1, 1);
+  }
+
+  function createTileTexture() {
+    return createCanvasTexture(function (ctx, w, h) {
+      ctx.fillStyle = '#e8e1d3';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#d1c7b4';
+      ctx.lineWidth = 3;
+      var step = 64;
+      for (var x = 0; x <= w; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (var y = 0; y <= h; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+    }, 256, 256, 4, 2);
+  }
+
+  function createRoofTileTexture() {
+    return createCanvasTexture(function (ctx, w, h) {
+      ctx.fillStyle = '#243a32';
+      ctx.fillRect(0, 0, w, h);
+      for (var y = 0; y < h; y += 24) {
+        ctx.fillStyle = y % 48 === 0 ? '#2b453b' : '#1e322b';
+        ctx.fillRect(0, y, w, 22);
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
+        ctx.fillRect(0, y + 21, w, 3);
+      }
+      for (var x = 0; x < w; x += 32) {
+        ctx.fillStyle = 'rgba(255,255,255,0.05)';
+        ctx.fillRect(x, 0, 3, h);
+      }
+    }, 256, 256, 4, 2);
+  }
+
+  function createSignTexture() {
+    return createCanvasTexture(function (ctx, w, h) {
+      ctx.fillStyle = '#1b2420';
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = '#c4542d';
+      ctx.lineWidth = 7;
+      ctx.strokeRect(7, 7, w - 14, h - 14);
+      ctx.fillStyle = '#faf8f3';
       ctx.font = 'bold 30px sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('KOS GRIYA ASRI', w / 2, h / 2 - 12);
+      ctx.fillText('KOS GRIYA ASRI', w / 2, h / 2 - 14);
       ctx.fillStyle = '#f3c178';
       ctx.font = '600 16px monospace';
-      ctx.fillText('6 KAMAR · 2 LANTAI', w / 2, h / 2 + 20);
-    }, 320, 110);
+      ctx.fillText('6 KAMAR · TERPADU DIGITAL', w / 2, h / 2 + 20);
+    }, 340, 120);
   }
 
   function createContractTexture(confirmed) {
-    return createCanvasLabelTexture(function (ctx, w, h) {
-      ctx.fillStyle = '#fcfaf5';
+    return createCanvasTexture(function (ctx, w, h) {
+      ctx.fillStyle = '#faf8f3';
       ctx.fillRect(0, 0, w, h);
-      ctx.strokeStyle = confirmed ? '#2b6f53' : '#173028';
+      ctx.strokeStyle = confirmed ? '#2b6f53' : '#1b2420';
       ctx.lineWidth = 8;
       ctx.strokeRect(4, 4, w - 8, h - 8);
 
-      ctx.fillStyle = '#173028';
-      ctx.fillRect(20, 22, w - 40, 34);
-      ctx.fillStyle = '#fff';
+      ctx.fillStyle = '#1b2420';
+      ctx.fillRect(18, 20, w - 36, 38);
+      ctx.fillStyle = '#ffffff';
       ctx.font = 'bold 17px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('KONTRAK SEWA DIGITAL', w / 2, 45);
+      ctx.fillText('KONTRAK SEWA DIGITAL', w / 2, 44);
 
-      ctx.fillStyle = '#7e8680';
+      ctx.fillStyle = '#8b928d';
       for (var i = 0; i < 6; i++) {
         ctx.fillRect(26, 78 + i * 24, w - 52 - (i % 2) * 32, 8);
       }
@@ -70,39 +150,39 @@
       if (confirmed) {
         ctx.strokeStyle = '#2b6f53';
         ctx.lineWidth = 5;
-        ctx.strokeRect(36, 232, w - 72, 44);
+        ctx.strokeRect(32, 232, w - 64, 44);
         ctx.fillStyle = '#2b6f53';
         ctx.font = 'bold 19px monospace';
         ctx.fillText('TERKONFIRMASI', w / 2, 260);
       } else {
-        ctx.fillStyle = '#c68621';
-        ctx.fillRect(24, 234, w - 48, 38);
-        ctx.fillStyle = '#fff';
+        ctx.fillStyle = '#c4542d';
+        ctx.fillRect(22, 232, w - 44, 42);
+        ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 15px monospace';
-        ctx.fillText('KONFIRMASI DULU', w / 2, 258);
+        ctx.fillText('KLIK KONFIRMASI', w / 2, 258);
       }
     }, 256, 310);
   }
 
   function createQrisTexture(paid) {
-    return createCanvasLabelTexture(function (ctx, w, h) {
+    return createCanvasTexture(function (ctx, w, h) {
       ctx.fillStyle = '#ffffff';
       ctx.fillRect(0, 0, w, h);
       ctx.strokeStyle = paid ? '#2b6f53' : '#c68621';
       ctx.lineWidth = 10;
       ctx.strokeRect(5, 5, w - 10, h - 10);
 
-      ctx.fillStyle = paid ? '#2b6f53' : '#173028';
+      ctx.fillStyle = paid ? '#2b6f53' : '#1b2420';
       ctx.fillRect(16, 16, w - 32, 38);
-      ctx.fillStyle = '#fff';
-      ctx.font = 'bold 19px monospace';
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 18px monospace';
       ctx.textAlign = 'center';
-      ctx.fillText(paid ? 'LUNAS OTOMATIS' : 'TAGIHAN QRIS', w / 2, 41);
+      ctx.fillText(paid ? 'LUNAS OTOMATIS' : 'BAYAR QRIS', w / 2, 41);
 
       var startX = 48;
       var startY = 72;
       var cell = 14;
-      ctx.fillStyle = '#173028';
+      ctx.fillStyle = '#1b2420';
       for (var r = 0; r < 10; r++) {
         for (var c = 0; c < 10; c++) {
           var corner = (r < 3 && c < 3) || (r < 3 && c > 6) || (r > 6 && c < 3);
@@ -113,8 +193,8 @@
       }
 
       ctx.fillStyle = paid ? '#2b6f53' : '#c4542d';
-      ctx.font = 'bold 16px sans-serif';
-      ctx.fillText(paid ? 'Rp 1.950.000 · TERCATAT' : 'Jatuh Tempo: H-2', w / 2, 236);
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText(paid ? 'Rp 1.950.000 LUNAS' : 'KLIK SIMULASI BAYAR', w / 2, 236);
     }, 240, 265);
   }
 
@@ -123,12 +203,16 @@
     this.pinsContainer = options.pinsContainer;
     this.mode = options.mode || 'studio';
     this.onRoomSelect = options.onRoomSelect || function () {};
+    this.onPropAction = options.onPropAction || function () {};
     this.roomsState = options.initialRooms || [];
 
     this.activeStep = 1;
     this.heroVisualMode = 'digital';
     this.floorFilter = 'all';
     this.selectedRoomId = this.mode === 'studio' ? 'K-102' : null;
+    this.hoveredRoomId = null;
+    this.isNightMode = false;
+    this.isRoofClosed = false;
 
     this.simState = {
       contractConfirmed: false,
@@ -154,13 +238,13 @@
 
   Kosan3DViewer.prototype._getCameraPreset = function () {
     if (this.mode === 'hero') {
-      return { theta: 0.64, phi: 0.94, radius: 17.5, tx: -0.2, ty: 2.2, tz: 0.3 };
+      return { theta: 0.62, phi: 0.94, radius: 17.8, tx: -0.2, ty: 2.2, tz: 0.3 };
     }
     if (this.floorFilter === '1') {
-      return { theta: 0.45, phi: 0.88, radius: 13.8, tx: 0.0, ty: 1.1, tz: 0.2 };
+      return { theta: 0.45, phi: 0.88, radius: 13.6, tx: 0.0, ty: 1.15, tz: 0.2 };
     }
     if (this.floorFilter === '2') {
-      return { theta: 0.5, phi: 0.85, radius: 13.6, tx: 0.0, ty: 3.4, tz: 0.2 };
+      return { theta: 0.5, phi: 0.84, radius: 13.5, tx: 0.0, ty: 3.45, tz: 0.2 };
     }
     if (this.floorFilter === 'roof') {
       return { theta: 0.62, phi: 0.72, radius: 15.8, tx: -0.2, ty: 4.5, tz: 0.0 };
@@ -168,17 +252,17 @@
 
     switch (this.activeStep) {
       case 1:
-        return { theta: 0.58, phi: 0.92, radius: 16.4, tx: 0.0, ty: 2.2, tz: 0.2 };
+        return { theta: 0.56, phi: 0.92, radius: 16.4, tx: 0.0, ty: 2.25, tz: 0.2 };
       case 2:
-        return { theta: 0.48, phi: 0.88, radius: 11.6, tx: -3.0, ty: 3.8, tz: 0.4 };
+        return { theta: 0.48, phi: 0.88, radius: 11.6, tx: -3.0, ty: 3.85, tz: 0.45 };
       case 3:
-        return { theta: 0.38, phi: 0.88, radius: 12.0, tx: -0.4, ty: 3.6, tz: 0.5 };
+        return { theta: 0.36, phi: 0.88, radius: 12.0, tx: -0.4, ty: 3.6, tz: 0.5 };
       case 4:
-        return { theta: -0.34, phi: 0.9, radius: 11.2, tx: 3.1, ty: 1.45, tz: 0.25 };
+        return { theta: -0.34, phi: 0.9, radius: 11.0, tx: 3.1, ty: 1.45, tz: 0.25 };
       case 5:
-        return { theta: 0.66, phi: 0.68, radius: 16.4, tx: -0.2, ty: 4.3, tz: -0.1 };
+        return { theta: 0.66, phi: 0.68, radius: 16.4, tx: -0.2, ty: 4.35, tz: -0.1 };
       default:
-        return { theta: 0.58, phi: 0.92, radius: 16.4, tx: 0.0, ty: 2.2, tz: 0.2 };
+        return { theta: 0.56, phi: 0.92, radius: 16.4, tx: 0.0, ty: 2.25, tz: 0.2 };
     }
   };
 
@@ -197,25 +281,32 @@
     });
     this.renderer.setPixelRatio(Math.min(global.devicePixelRatio || 1, 2));
     this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.toneMappingExposure = 1.04;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    var preset = this._getCameraPreset();
-    this.camCurrent = {
-      theta: preset.theta,
-      phi: preset.phi,
-      radius: preset.radius,
-      tx: preset.tx,
-      ty: preset.ty,
-      tz: preset.tz
+    // Shared procedural architectural textures
+    this.textures = {
+      brick: createBrickTexture(),
+      wood: createWoodTexture(),
+      tile: createTileTexture(),
+      roof: createRoofTileTexture()
     };
-    this.camTarget = Object.assign({}, this.camCurrent);
+
+    var preset = this._getCameraPreset();
+    this.camCurrent = Object.assign({}, preset);
+    this.camTarget = Object.assign({}, preset);
 
     this.raycaster = new THREE.Raycaster();
     this.pointerNDC = new THREE.Vector2();
     this.roomMeshes = {};
     this.pickables = [];
+    this.actionPickables = [];
     this.pinElements = {};
+    this.nightGlowMats = [];
+    this.acFans = [];
+    this.waterDrops = [];
 
     this._setupLights();
     this._buildSiteAndBuilding();
@@ -233,42 +324,49 @@
 
   Kosan3DViewer.prototype._setupLights = function () {
     var THREE = this.THREE;
-    var hemi = new THREE.HemisphereLight(0xfffbf0, 0xbab09d, 0.94);
-    this.scene.add(hemi);
+    this.hemiLight = new THREE.HemisphereLight(0xfffcf2, 0xb9af9b, 0.92);
+    this.scene.add(this.hemiLight);
 
-    var sun = new THREE.DirectionalLight(0xfff5e4, 1.06);
-    sun.position.set(11, 17, 12);
-    sun.castShadow = true;
-    sun.shadow.mapSize.width = 1024;
-    sun.shadow.mapSize.height = 1024;
-    sun.shadow.camera.near = 2;
-    sun.shadow.camera.far = 42;
-    var d = 10;
-    sun.shadow.camera.left = -d;
-    sun.shadow.camera.right = d;
-    sun.shadow.camera.top = d;
-    sun.shadow.camera.bottom = -d;
-    sun.shadow.bias = -0.0008;
-    this.scene.add(sun);
+    this.sunLight = new THREE.DirectionalLight(0xfff4e0, 1.12);
+    this.sunLight.position.set(11, 18, 12);
+    this.sunLight.castShadow = true;
+    this.sunLight.shadow.mapSize.width = 2048;
+    this.sunLight.shadow.mapSize.height = 2048;
+    this.sunLight.shadow.camera.near = 2;
+    this.sunLight.shadow.camera.far = 44;
+    var d = 10.5;
+    this.sunLight.shadow.camera.left = -d;
+    this.sunLight.shadow.camera.right = d;
+    this.sunLight.shadow.camera.top = d;
+    this.sunLight.shadow.camera.bottom = -d;
+    this.sunLight.shadow.bias = -0.0006;
+    this.scene.add(this.sunLight);
 
-    var fill = new THREE.DirectionalLight(0xd9ece5, 0.36);
-    fill.position.set(-10, 8, -8);
-    this.scene.add(fill);
+    this.fillLight = new THREE.DirectionalLight(0xd9ece5, 0.35);
+    this.fillLight.position.set(-10, 8, -8);
+    this.scene.add(this.fillLight);
+
+    // Warm interior accent point light activated in Night Mode
+    this.warmNightLight = new THREE.PointLight(0xffb86b, 0, 18);
+    this.warmNightLight.position.set(0, 3.2, 3.2);
+    this.scene.add(this.warmNightLight);
   };
 
   Kosan3DViewer.prototype._makeBox = function (w, h, d, color, opts) {
     var THREE = this.THREE;
     opts = opts || {};
     var geo = new THREE.BoxGeometry(w, h, d);
-    var mat = new THREE.MeshStandardMaterial({
-      color: color,
+    var matProps = {
+      color: opts.map ? 0xffffff : color,
       roughness: opts.roughness !== undefined ? opts.roughness : 0.72,
       metalness: opts.metalness !== undefined ? opts.metalness : 0.05,
       transparent: !!opts.transparent,
       opacity: opts.opacity !== undefined ? opts.opacity : 1.0,
       emissive: opts.emissive || 0x000000,
       emissiveIntensity: opts.emissiveIntensity || 0
-    });
+    };
+    if (opts.map) matProps.map = opts.map;
+    var mat = new THREE.MeshStandardMaterial(matProps);
     var mesh = new THREE.Mesh(geo, mat);
     mesh.castShadow = opts.castShadow !== false;
     mesh.receiveShadow = opts.receiveShadow !== false;
@@ -282,158 +380,225 @@
     this.worldGroup = new THREE.Group();
     this.scene.add(this.worldGroup);
 
-    // Site base & road
-    var plinth = this._makeBox(15.2, 0.45, 9.6, 0xddd4c2, { roughness: 0.88 });
-    plinth.position.set(-0.3, -0.22, 0.3);
+    // Architectural site plinth & courtyard tile
+    var plinth = this._makeBox(15.6, 0.45, 9.8, 0xd8cfbe, { roughness: 0.9 });
+    plinth.position.set(-0.3, -0.22, 0.35);
     this.worldGroup.add(plinth);
 
-    var road = this._makeBox(15.2, 0.08, 2.1, 0x454c47, { roughness: 0.92 });
-    road.position.set(-0.3, 0.02, 4.05);
+    var road = this._makeBox(15.6, 0.08, 2.2, 0x3b413d, { roughness: 0.95 });
+    road.position.set(-0.3, 0.02, 4.15);
     this.worldGroup.add(road);
 
     for (var rx = -6; rx <= 5; rx += 2.4) {
       var dash = this._makeBox(1.1, 0.09, 0.14, 0xf3eee2, { castShadow: false });
-      dash.position.set(rx, 0.03, 4.05);
+      dash.position.set(rx, 0.03, 4.15);
       this.worldGroup.add(dash);
     }
 
-    var yard = this._makeBox(14.6, 0.06, 6.4, 0xebe4d6, { roughness: 0.85 });
-    yard.position.set(-0.3, 0.03, -0.2);
+    var yard = this._makeBox(15.0, 0.07, 6.45, 0xffffff, { map: this.textures.tile, roughness: 0.82 });
+    yard.position.set(-0.3, 0.035, -0.18);
     this.worldGroup.add(yard);
 
-    // Planter box + Tropical plants
-    var planter = this._makeBox(3.4, 0.38, 0.9, 0xc4542d, { roughness: 0.78 });
-    planter.position.set(3.4, 0.22, 2.55);
+    // Front minimalist perimeter fence & gate pillars
+    var fenceLeft = this._makeBox(2.8, 0.72, 0.18, 0xffffff, { map: this.textures.brick, roughness: 0.82 });
+    fenceLeft.position.set(-6.1, 0.4, 2.88);
+    this.worldGroup.add(fenceLeft);
+
+    [-4.6, 1.4].forEach(function (gx) {
+      var pillar = self._makeBox(0.32, 1.45, 0.32, 0xffffff, { map: self.textures.brick, roughness: 0.82 });
+      pillar.position.set(gx, 0.75, 2.88);
+      self.worldGroup.add(pillar);
+    });
+
+    // Sliding steel gate (partially open for welcoming entrance)
+    for (var bar = 0; bar < 7; bar++) {
+      var picket = this._makeBox(0.06, 1.05, 0.06, 0x1b2420);
+      picket.position.set(-1.1 + bar * 0.34, 0.62, 2.88);
+      this.worldGroup.add(picket);
+    }
+    var gateRail = this._makeBox(2.4, 0.08, 0.09, 0x1b2420);
+    gateRail.position.set(-0.08, 1.12, 2.88);
+    this.worldGroup.add(gateRail);
+
+    // Front Garden Lamp Post (glows warmly in Night Mode)
+    var lampPost = this._makeBox(0.1, 1.9, 0.1, 0x1b2420);
+    lampPost.position.set(1.85, 0.98, 2.68);
+    var gardenBulbMat = new THREE.MeshStandardMaterial({
+      color: 0xfff3d4,
+      emissive: 0xffb347,
+      emissiveIntensity: 0.15,
+      roughness: 0.2
+    });
+    var gardenBulb = new THREE.Mesh(new THREE.SphereGeometry(0.18, 14, 14), gardenBulbMat);
+    gardenBulb.position.set(1.85, 1.98, 2.68);
+    this.nightGlowMats.push({ mat: gardenBulbMat, day: 0.15, night: 1.45 });
+    this.worldGroup.add(lampPost, gardenBulb);
+
+    // Brick planter box + multi-leaf tropical foliage
+    var planter = this._makeBox(3.3, 0.42, 0.9, 0xffffff, { map: this.textures.brick, roughness: 0.82 });
+    planter.position.set(3.55, 0.25, 2.58);
     this.worldGroup.add(planter);
 
     for (var p = 0; p < 3; p++) {
-      var plant = new THREE.Mesh(
-        new THREE.DodecahedronGeometry(0.42 + (p % 2) * 0.08, 0),
-        new THREE.MeshStandardMaterial({ color: p === 1 ? 0x2b6f53 : 0x3b8463, roughness: 0.78 })
-      );
-      plant.position.set(2.4 + p * 0.95, 0.62, 2.55);
-      plant.castShadow = true;
-      this.worldGroup.add(plant);
+      var bushGroup = new THREE.Group();
+      bushGroup.position.set(2.65 + p * 0.9, 0.52, 2.58);
+      for (var lf = 0; lf < 4; lf++) {
+        var leaf = new THREE.Mesh(
+          new THREE.DodecahedronGeometry(0.28 + (lf % 2) * 0.08, 0),
+          new THREE.MeshStandardMaterial({ color: lf % 2 === 0 ? 0x2b6f53 : 0x3b8463, roughness: 0.75 })
+        );
+        leaf.position.set(Math.cos(lf * 1.6) * 0.2, (lf % 2) * 0.16, Math.sin(lf * 1.6) * 0.16);
+        leaf.castShadow = true;
+        bushGroup.add(leaf);
+      }
+      this.worldGroup.add(bushGroup);
     }
 
-    // Carport / Parkiran Motor
+    // Carport / Parkiran Motor with 2 detailed scooters
     this.carportGroup = new THREE.Group();
-    this.carportGroup.position.set(-6.05, 0.06, 0.6);
+    this.carportGroup.position.set(-6.15, 0.06, 0.6);
     [
       [-1.1, -1.2],
       [1.1, -1.2],
       [-1.1, 1.3],
       [1.1, 1.3]
     ].forEach(function (pos) {
-      var post = self._makeBox(0.11, 2.25, 0.11, 0x1e2c26);
-      post.position.set(pos[0], 1.12, pos[1]);
+      var post = self._makeBox(0.11, 2.28, 0.11, 0x1b2420);
+      post.position.set(pos[0], 1.14, pos[1]);
       self.carportGroup.add(post);
     });
-    var canopy = this._makeBox(2.65, 0.1, 2.95, 0x284e41, { transparent: true, opacity: 0.82 });
-    canopy.position.set(0, 2.28, 0.05);
+    var canopy = this._makeBox(2.7, 0.1, 2.95, 0x233c33, { transparent: true, opacity: 0.82 });
+    canopy.position.set(0, 2.3, 0.05);
     canopy.rotation.z = 0.05;
     this.carportGroup.add(canopy);
 
-    // 2 Stylized 3D Motorbikes
-    [-0.48, 0.52].forEach(function (mx, idx) {
+    [-0.5, 0.5].forEach(function (mx, idx) {
       var moto = new THREE.Group();
       moto.position.set(mx, 0, 0.15);
-      var wheelGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.11, 14);
+      var wheelGeo = new THREE.CylinderGeometry(0.22, 0.22, 0.11, 16);
       wheelGeo.rotateZ(Math.PI / 2);
-      var wheelMat = new THREE.MeshStandardMaterial({ color: 0x222625, roughness: 0.8 });
+      var wheelMat = new THREE.MeshStandardMaterial({ color: 0x1b1e1d, roughness: 0.82 });
       var w1 = new THREE.Mesh(wheelGeo, wheelMat);
-      w1.position.set(0, 0.22, 0.45);
+      w1.position.set(0, 0.22, 0.46);
       var w2 = new THREE.Mesh(wheelGeo, wheelMat);
-      w2.position.set(0, 0.22, -0.45);
-      var body = self._makeBox(0.32, 0.34, 1.05, idx === 0 ? 0xc4542d : 0x2b6f53);
+      w2.position.set(0, 0.22, -0.46);
+      var body = self._makeBox(0.32, 0.34, 1.05, idx === 0 ? 0xc4542d : 0x1e4a3b, { roughness: 0.35 });
       body.position.set(0, 0.46, 0);
       var seat = self._makeBox(0.28, 0.1, 0.55, 0x23201e);
       seat.position.set(0, 0.68, -0.15);
-      var stem = self._makeBox(0.08, 0.48, 0.08, 0x383e3b);
+      var stem = self._makeBox(0.08, 0.52, 0.08, 0x383e3b);
       stem.position.set(0, 0.72, 0.36);
       stem.rotation.x = -0.22;
-      var bar = self._makeBox(0.46, 0.06, 0.08, 0x232624);
-      bar.position.set(0, 0.94, 0.31);
-      moto.add(w1, w2, body, seat, stem, bar);
+      var bar = self._makeBox(0.52, 0.06, 0.08, 0x232624);
+      bar.position.set(0, 0.96, 0.31);
+      var headlightMat = new THREE.MeshStandardMaterial({
+        color: 0xfff7dc,
+        emissive: 0xffe4a0,
+        emissiveIntensity: 0.1
+      });
+      var headlight = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.12, 0.06), headlightMat);
+      headlight.position.set(0, 0.76, 0.48);
+      self.nightGlowMats.push({ mat: headlightMat, day: 0.1, night: 0.85 });
+      // Helmet resting on seat
+      var helmet = new THREE.Mesh(
+        new THREE.SphereGeometry(0.14, 12, 12),
+        new THREE.MeshStandardMaterial({ color: idx === 0 ? 0xfaf8f3 : 0xc4542d, roughness: 0.3 })
+      );
+      helmet.position.set(0, 0.84, -0.12);
+      moto.add(w1, w2, body, seat, stem, bar, headlight, helmet);
       self.carportGroup.add(moto);
     });
     this.worldGroup.add(this.carportGroup);
 
     // Kos Signboard
-    var signPost = this._makeBox(0.14, 1.85, 0.14, 0x2a2f2c);
-    signPost.position.set(-4.35, 0.95, 2.55);
+    var signPost = this._makeBox(0.14, 1.9, 0.14, 0x1b2420);
+    signPost.position.set(-4.6, 0.98, 2.55);
     this.worldGroup.add(signPost);
 
+    var signBoardMat = new THREE.MeshStandardMaterial({
+      map: createSignTexture(),
+      roughness: 0.4,
+      emissive: 0xffd79e,
+      emissiveIntensity: 0.04
+    });
+    this.nightGlowMats.push({ mat: signBoardMat, day: 0.04, night: 0.32 });
     var signBoard = new THREE.Mesh(
-      new THREE.BoxGeometry(1.75, 0.65, 0.12),
+      new THREE.BoxGeometry(1.9, 0.7, 0.12),
       [
-        new THREE.MeshStandardMaterial({ color: 0x173028 }),
-        new THREE.MeshStandardMaterial({ color: 0x173028 }),
-        new THREE.MeshStandardMaterial({ color: 0x173028 }),
-        new THREE.MeshStandardMaterial({ color: 0x173028 }),
-        new THREE.MeshStandardMaterial({ map: createSignTexture(), roughness: 0.45 }),
-        new THREE.MeshStandardMaterial({ color: 0x173028 })
+        new THREE.MeshStandardMaterial({ color: 0x1b2420 }),
+        new THREE.MeshStandardMaterial({ color: 0x1b2420 }),
+        new THREE.MeshStandardMaterial({ color: 0x1b2420 }),
+        new THREE.MeshStandardMaterial({ color: 0x1b2420 }),
+        signBoardMat,
+        new THREE.MeshStandardMaterial({ color: 0x1b2420 })
       ]
     );
-    signBoard.position.set(-4.35, 1.82, 2.55);
+    signBoard.position.set(-4.6, 1.92, 2.55);
     signBoard.castShadow = true;
     this.worldGroup.add(signBoard);
 
     this.floor1Group = new THREE.Group();
     this.floor2Group = new THREE.Group();
     this.roofGroup = new THREE.Group();
-    this.worldGroup.add(this.floor1Group, this.floor2Group, this.roofGroup);
+    this.closedRoofGroup = new THREE.Group();
+    this.worldGroup.add(this.floor1Group, this.floor2Group, this.roofGroup, this.closedRoofGroup);
 
     // Floor 1 Base & Back Wall
-    var f1Slab = this._makeBox(9.9, 0.22, 3.8, 0xf2ece0);
+    var f1Slab = this._makeBox(9.95, 0.22, 3.85, 0xf2ece0);
     f1Slab.position.set(0, 0.12, 0.1);
     this.floor1Group.add(f1Slab);
 
-    var f1BackWall = this._makeBox(9.9, 2.45, 0.16, 0xf7f3ea);
-    f1BackWall.position.set(0, 1.35, -1.72);
+    var f1BackWall = this._makeBox(9.95, 2.48, 0.16, 0xf8f4ec);
+    f1BackWall.position.set(0, 1.36, -1.72);
     this.floor1Group.add(f1BackWall);
 
-    // Terracotta architectural side accent column
-    var leftAccent = this._makeBox(0.24, 5.15, 3.7, 0xc4542d, { roughness: 0.78 });
-    leftAccent.position.set(-4.84, 2.68, 0.1);
-    this.floor1Group.add(leftAccent);
+    // Exposed Brick Feature Wall on Left Facade
+    var leftBrickPillar = this._makeBox(0.28, 5.18, 3.74, 0xffffff, { map: this.textures.brick, roughness: 0.85 });
+    leftBrickPillar.position.set(-4.84, 2.68, 0.1);
+    this.floor1Group.add(leftBrickPillar);
 
-    // Admin Kos Desk + Monitor Hub
-    var adminDesk = this._makeBox(0.95, 0.65, 0.55, 0x8f5b38);
-    adminDesk.position.set(-4.0, 0.42, 1.85);
-    var adminMonitor = this._makeBox(0.55, 0.36, 0.06, 0x173028, { emissive: 0x2b6f53, emissiveIntensity: 0.45 });
-    adminMonitor.position.set(-4.0, 0.94, 1.82);
+    // Admin Kos Desk + Glowing Dashboard Monitor
+    var adminDesk = this._makeBox(1.05, 0.68, 0.58, 0xffffff, { map: this.textures.wood });
+    adminDesk.position.set(-3.95, 0.42, 1.88);
+    var adminScreenMat = new THREE.MeshStandardMaterial({
+      color: 0x1b2420,
+      emissive: 0x4ca97e,
+      emissiveIntensity: 0.55,
+      roughness: 0.3
+    });
+    var adminMonitor = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.38, 0.06), adminScreenMat);
+    adminMonitor.position.set(-3.95, 0.96, 1.85);
     this.floor1Group.add(adminDesk, adminMonitor);
 
-    // Staircase L1 -> L2
+    // Wooden Staircase connecting L1 -> L2
     for (var s = 0; s < 7; s++) {
-      var step = this._makeBox(0.75, 0.24, 0.42, 0xb88f64);
-      step.position.set(5.25, 0.24 + s * 0.36, -1.3 + s * 0.42);
+      var step = this._makeBox(0.78, 0.22, 0.42, 0xffffff, { map: this.textures.wood });
+      step.position.set(5.26, 0.24 + s * 0.36, -1.3 + s * 0.42);
       this.floor1Group.add(step);
     }
 
-    // Floor 2 Slab & Balcony Rail
-    var f2Slab = this._makeBox(9.9, 0.22, 4.25, 0xe8e0d0);
+    // Floor 2 Slab & Balcony Glass Rail
+    var f2Slab = this._makeBox(9.95, 0.22, 4.28, 0xe8e0d0);
     f2Slab.position.set(0, 2.65, 0.32);
     this.floor2Group.add(f2Slab);
 
-    var railTop = this._makeBox(9.8, 0.07, 0.07, 0x1e2c26);
-    railTop.position.set(0, 3.45, 2.36);
-    var railGlass = this._makeBox(9.7, 0.62, 0.04, 0x8eb8ac, { transparent: true, opacity: 0.35, castShadow: false });
-    railGlass.position.set(0, 3.08, 2.36);
+    var railTop = this._makeBox(9.8, 0.07, 0.07, 0x1b2420);
+    railTop.position.set(0, 3.45, 2.38);
+    var railGlass = this._makeBox(9.7, 0.62, 0.04, 0x8eb8ac, { transparent: true, opacity: 0.32, castShadow: false });
+    railGlass.position.set(0, 3.08, 2.38);
     this.floor2Group.add(railTop, railGlass);
 
-    var f2BackWall = this._makeBox(9.9, 2.45, 0.16, 0xf7f3ea);
+    var f2BackWall = this._makeBox(9.95, 2.48, 0.16, 0xf8f4ec);
     f2BackWall.position.set(0, 3.92, -1.72);
     this.floor2Group.add(f2BackWall);
 
-    // Partition walls between rooms
+    // Partition walls between rooms + AC Outdoor Condenser Units on exterior wall
     [-1.6, 1.6, 4.82].forEach(function (px) {
-      var p1 = self._makeBox(0.12, 2.42, 3.55, 0xe9e2d4);
+      var p1 = self._makeBox(0.12, 2.44, 3.55, 0xebe4d6);
       p1.position.set(px, 1.35, 0.05);
       self.floor1Group.add(p1);
 
-      var p2 = self._makeBox(0.12, 2.42, 3.55, 0xe9e2d4);
+      var p2 = self._makeBox(0.12, 2.44, 3.55, 0xebe4d6);
       p2.position.set(px, 3.9, 0.05);
       self.floor2Group.add(p2);
     });
@@ -442,13 +607,12 @@
       self._buildRoom(layout);
     });
 
-    // Cutaway Rooftop Deck (covers rear half z: -1.9..0.1 so Lantai 2 interiors stay completely open & sunlit!)
-    var roofDeck = this._makeBox(10.3, 0.22, 2.05, 0x26443a);
+    // Cutaway Rooftop Deck (leaves front L2 rooms sunlit & visible)
+    var roofDeck = this._makeBox(10.35, 0.22, 2.08, 0x1f352d);
     roofDeck.position.set(0, 5.2, -0.88);
     this.roofGroup.add(roofDeck);
 
-    // Slim front architectural pergola beam along front edge (leaves sky open above L2 rooms)
-    var frontBeam = this._makeBox(10.1, 0.14, 0.2, 0x173028);
+    var frontBeam = this._makeBox(10.1, 0.14, 0.2, 0x1b2420);
     frontBeam.position.set(0, 5.2, 2.28);
     this.roofGroup.add(frontBeam);
 
@@ -458,21 +622,35 @@
       self.roofGroup.add(rafter);
     });
 
-    var roofOverhang = this._makeBox(10.5, 0.16, 1.65, 0xc4542d);
+    var roofOverhang = this._makeBox(10.55, 0.16, 1.68, 0xffffff, { map: this.textures.roof });
     roofOverhang.position.set(0, 5.42, -1.2);
     roofOverhang.rotation.x = -0.18;
     this.roofGroup.add(roofOverhang);
 
-    // Toren Air (Water Tank) cleanly on rear-right roof
+    // Toren Air (Water Tank) with supply pipe
     var tankStand = this._makeBox(1.1, 0.65, 1.1, 0x3b4440);
     tankStand.position.set(3.8, 5.64, -0.92);
     var tankBody = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.56, 0.58, 1.25, 18),
-      new THREE.MeshStandardMaterial({ color: 0x2b6e8e, roughness: 0.38, metalness: 0.15 })
+      new THREE.CylinderGeometry(0.56, 0.58, 1.25, 20),
+      new THREE.MeshStandardMaterial({ color: 0x256888, roughness: 0.32, metalness: 0.15 })
     );
     tankBody.position.set(3.8, 6.54, -0.92);
     tankBody.castShadow = true;
-    this.roofGroup.add(tankStand, tankBody);
+    var tankPipe = this._makeBox(0.08, 4.8, 0.08, 0x899499);
+    tankPipe.position.set(4.55, 2.9, -1.85);
+    this.roofGroup.add(tankStand, tankBody, tankPipe);
+
+    // Full Architectural Pitched Roof (Closed mode toggle)
+    this.closedRoofGroup.visible = false;
+    var frontSlope = this._makeBox(10.8, 0.16, 3.05, 0xffffff, { map: this.textures.roof });
+    frontSlope.position.set(0, 5.68, 0.95);
+    frontSlope.rotation.x = 0.25;
+    var backSlope = this._makeBox(10.8, 0.16, 2.95, 0xffffff, { map: this.textures.roof });
+    backSlope.position.set(0, 5.68, -1.35);
+    backSlope.rotation.x = -0.25;
+    var ridgeCap = this._makeBox(10.9, 0.14, 0.28, 0xc4542d);
+    ridgeCap.position.set(0, 6.08, -0.2);
+    this.closedRoofGroup.add(frontSlope, backSlope, ridgeCap);
   };
 
   Kosan3DViewer.prototype._buildRoom = function (layout) {
@@ -484,7 +662,7 @@
 
     var floorPadMat = new THREE.MeshStandardMaterial({
       color: 0x2b6f53,
-      roughness: 0.68,
+      roughness: 0.65,
       emissive: 0x000000,
       emissiveIntensity: 0
     });
@@ -503,60 +681,130 @@
     roomGroup.add(frontStrip);
 
     var selectFrame = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.BoxGeometry(2.92, 0.16, 3.16)),
-      new THREE.LineBasicMaterial({ color: 0xf3c178, transparent: true, opacity: 0 })
+      new THREE.EdgesGeometry(new THREE.BoxGeometry(2.94, 0.18, 3.18)),
+      new THREE.LineBasicMaterial({ color: 0xc4542d, transparent: true, opacity: 0 })
     );
     selectFrame.position.set(0, 0.16, -0.15);
     roomGroup.add(selectFrame);
 
-    // Bed + blanket + pillow
-    var bedFrame = this._makeBox(1.28, 0.24, 1.75, 0x8d5d3c);
-    bedFrame.position.set(-0.62, 0.27, -0.58);
-    var mattress = this._makeBox(1.18, 0.18, 1.65, 0xfaf6ed);
-    mattress.position.set(-0.62, 0.45, -0.58);
-    var blanket = this._makeBox(1.2, 0.19, 0.92, layout.floor === 1 ? 0xc4542d : 0x2b6f53);
-    blanket.position.set(-0.62, 0.46, -0.2);
-    var pillow = this._makeBox(0.68, 0.12, 0.36, 0xffffff);
-    pillow.position.set(-0.62, 0.58, -1.18);
-    roomGroup.add(bedFrame, mattress, blanket, pillow);
+    // Swinging Hinged Wooden Door along front-left edge
+    var doorPivot = new THREE.Group();
+    doorPivot.position.set(-1.35, 0.15, 1.44);
+    var doorPanel = this._makeBox(0.76, 1.88, 0.07, 0xffffff, { map: this.textures.wood });
+    doorPanel.position.set(0.38, 0.94, 0);
+    var doorHandle = this._makeBox(0.1, 0.05, 0.11, 0xd8a24a, { metalness: 0.5 });
+    doorHandle.position.set(0.68, 0.9, 0.02);
+    doorPivot.add(doorPanel, doorHandle);
+    doorPivot.rotation.y = 0.25;
+    roomGroup.add(doorPivot);
 
-    // Bedside Rug
-    var rug = this._makeBox(0.95, 0.03, 1.25, 0xded5c3, { castShadow: false });
-    rug.position.set(0.52, 0.16, -0.2);
+    // Bed + Headboard + Blanket + Dual Pillows
+    var bedFrame = this._makeBox(1.3, 0.24, 1.76, 0xffffff, { map: this.textures.wood });
+    bedFrame.position.set(-0.62, 0.27, -0.58);
+    var headboard = this._makeBox(1.3, 0.72, 0.1, 0xffffff, { map: this.textures.wood });
+    headboard.position.set(-0.62, 0.55, -1.42);
+    var mattress = this._makeBox(1.2, 0.18, 1.66, 0xfaf6ed);
+    mattress.position.set(-0.62, 0.45, -0.58);
+    var blanket = this._makeBox(1.22, 0.19, 0.94, layout.floor === 1 ? 0xc4542d : 0x2b6f53);
+    blanket.position.set(-0.62, 0.46, -0.2);
+    var pillow = this._makeBox(0.84, 0.13, 0.38, 0xffffff);
+    pillow.position.set(-0.62, 0.59, -1.16);
+    roomGroup.add(bedFrame, headboard, mattress, blanket, pillow);
+
+    // Framed Wall Art above bed
+    var wallArt = this._makeBox(0.68, 0.46, 0.05, 0xc4542d);
+    wallArt.position.set(-0.62, 1.45, -1.68);
+    roomGroup.add(wallArt);
+
+    // Bedside Nightstand + Glowing Lamp
+    var stand = this._makeBox(0.38, 0.42, 0.36, 0xffffff, { map: this.textures.wood });
+    stand.position.set(0.24, 0.35, -1.28);
+    var lampShadeMat = new THREE.MeshStandardMaterial({
+      color: 0xf7e7c4,
+      emissive: 0xffb347,
+      emissiveIntensity: 0.08,
+      roughness: 0.4
+    });
+    var lampShade = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.16, 0.18, 12), lampShadeMat);
+    lampShade.position.set(0.24, 0.68, -1.28);
+    this.nightGlowMats.push({ mat: lampShadeMat, day: 0.08, night: 1.35, roomId: layout.id });
+    roomGroup.add(stand, lampShade);
+
+    // Rug
+    var rug = this._makeBox(0.95, 0.03, 1.25, 0xe1d8c6, { castShadow: false });
+    rug.position.set(0.52, 0.16, -0.15);
     roomGroup.add(rug);
 
     // Wardrobe
-    var wardrobe = this._makeBox(0.75, 1.62, 0.52, 0x704a30);
-    wardrobe.position.set(0.88, 0.94, -1.25);
+    var wardrobe = this._makeBox(0.75, 1.64, 0.52, 0xffffff, { map: this.textures.wood });
+    wardrobe.position.set(0.9, 0.94, -1.25);
     roomGroup.add(wardrobe);
 
-    // Desk + Laptop + Chair
-    var desk = this._makeBox(0.95, 0.58, 0.55, 0xa8764f);
-    desk.position.set(0.78, 0.44, 0.28);
-    var laptop = this._makeBox(0.36, 0.04, 0.26, 0x24342e);
-    laptop.position.set(0.78, 0.75, 0.28);
+    // Study Desk + Glowing Laptop Screen + Chair
+    var desk = this._makeBox(0.95, 0.58, 0.55, 0xffffff, { map: this.textures.wood });
+    desk.position.set(0.8, 0.44, 0.34);
+    var laptopBase = this._makeBox(0.36, 0.03, 0.25, 0x24342e);
+    laptopBase.position.set(0.8, 0.75, 0.34);
+    var laptopScreenMat = new THREE.MeshStandardMaterial({
+      color: 0xcbe8df,
+      emissive: 0x77c5a5,
+      emissiveIntensity: 0.2
+    });
+    var laptopScreen = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.24, 0.03), laptopScreenMat);
+    laptopScreen.position.set(0.8, 0.87, 0.22);
+    laptopScreen.rotation.x = -0.18;
+    this.nightGlowMats.push({ mat: laptopScreenMat, day: 0.2, night: 0.85, roomId: layout.id });
     var chair = this._makeBox(0.36, 0.38, 0.36, 0x3b4c45);
-    chair.position.set(0.3, 0.34, 0.28);
-    roomGroup.add(desk, laptop, chair);
+    chair.position.set(0.32, 0.34, 0.34);
+    roomGroup.add(desk, laptopBase, laptopScreen, chair);
 
-    // AC Indoor Unit or Sink/Keran
+    // AC Unit + Outdoor Condenser with spinning fan, OR Bathroom Sink/Faucet
     if (layout.id !== 'K-103' && layout.id !== 'K-203') {
-      var acUnit = this._makeBox(0.82, 0.24, 0.22, 0xfdfdfd);
-      acUnit.position.set(-0.55, 1.92, -1.62);
-      var acStripe = this._makeBox(0.7, 0.04, 0.23, 0x2b6f53);
-      acStripe.position.set(-0.55, 1.86, -1.62);
+      var acUnit = this._makeBox(0.84, 0.24, 0.22, 0xfdfdfd);
+      acUnit.position.set(0.35, 1.94, -1.62);
+      var acStripe = this._makeBox(0.72, 0.04, 0.23, 0x2b6f53);
+      acStripe.position.set(0.35, 1.88, -1.62);
       roomGroup.add(acUnit, acStripe);
+
+      // Outdoor AC Condenser on exterior rear wall
+      var outdoorBox = this._makeBox(0.62, 0.48, 0.26, 0xeae6dd);
+      outdoorBox.position.set(0.35, 1.6, -1.96);
+      var fanBlade = this._makeBox(0.28, 0.05, 0.04, 0x1b2420);
+      fanBlade.position.set(0.35, 1.6, -2.11);
+      this.acFans.push(fanBlade);
+      roomGroup.add(outdoorBox, fanBlade);
     } else {
-      var sinkBase = this._makeBox(0.55, 0.68, 0.48, 0xe8e4dc);
+      var sinkBase = this._makeBox(0.58, 0.68, 0.48, 0xf1eee7);
       sinkBase.position.set(0.95, 0.46, -0.45);
-      var faucet = this._makeBox(0.08, 0.26, 0.14, 0x9aa3a8);
-      faucet.position.set(0.95, 0.9, -0.58);
-      roomGroup.add(sinkBase, faucet);
+      var basin = this._makeBox(0.46, 0.1, 0.38, 0xffffff);
+      basin.position.set(0.95, 0.82, -0.45);
+      var faucet = this._makeBox(0.08, 0.26, 0.16, 0xadb5ba, { metalness: 0.7, roughness: 0.25 });
+      faucet.position.set(0.95, 0.96, -0.58);
+      roomGroup.add(sinkBase, basin, faucet);
+
+      // Animated dripping water droplets specifically in K-103 for Step 4!
+      if (layout.id === 'K-103') {
+        for (var wd = 0; wd < 3; wd++) {
+          var drop = new THREE.Mesh(
+            new THREE.SphereGeometry(0.055, 8, 8),
+            new THREE.MeshStandardMaterial({ color: 0x5ab8e8, emissive: 0x3b96c9, emissiveIntensity: 0.4 })
+          );
+          drop.position.set(0.95, 0.88, -0.48);
+          drop.userData.phase = wd * 0.33;
+          roomGroup.add(drop);
+          this.waterDrops.push(drop);
+        }
+      }
     }
 
-    var winFrame = this._makeBox(0.95, 0.75, 0.22, 0x8cc2d4, { transparent: true, opacity: 0.55, castShadow: false });
-    winFrame.position.set(-0.4, 1.35, -1.72);
-    roomGroup.add(winFrame);
+    // Window with Curtain flanking panels
+    var winFrame = this._makeBox(0.95, 0.78, 0.22, 0x8cc2d4, { transparent: true, opacity: 0.55, castShadow: false });
+    winFrame.position.set(0.45, 1.38, -1.72);
+    var curtainL = this._makeBox(0.22, 0.92, 0.12, 0xc4542d);
+    curtainL.position.set(-0.08, 1.36, -1.62);
+    var curtainR = this._makeBox(0.22, 0.92, 0.12, 0xc4542d);
+    curtainR.position.set(0.98, 1.36, -1.62);
+    roomGroup.add(winFrame, curtainL, curtainR);
 
     var hitbox = new THREE.Mesh(
       new THREE.BoxGeometry(2.95, 2.25, 3.2),
@@ -573,7 +821,9 @@
       floorPadMat: floorPadMat,
       frontStripMat: frontStripMat,
       selectFrame: selectFrame,
-      anchor: new THREE.Vector3(layout.x, layout.y + 2.05, layout.z + 1.15)
+      doorPivot: doorPivot,
+      doorTargetAngle: 0.25,
+      anchor: new THREE.Vector3(layout.x, layout.y + 2.08, layout.z + 1.15)
     };
   };
 
@@ -584,7 +834,7 @@
     this.flowPropsGroup = new THREE.Group();
     this.worldGroup.add(this.flowPropsGroup);
 
-    // Step 2: Digital Contract + Brass Key floating cleanly above open front of K-201
+    // Step 2: Clickable 3D Contract Sheet + Brass Key above K-201
     this.contractGroup = new THREE.Group();
     this.contractGroup.position.set(-3.2, 5.8, 1.15);
     this.contractGroup.visible = false;
@@ -594,13 +844,15 @@
       roughness: 0.45,
       side: THREE.DoubleSide
     });
-    this.contractSheet = new THREE.Mesh(new THREE.PlaneGeometry(1.42, 1.72), this.contractSheetMat);
+    this.contractSheet = new THREE.Mesh(new THREE.PlaneGeometry(1.48, 1.78), this.contractSheetMat);
     this.contractSheet.position.set(-0.45, 0.25, 0);
+    this.contractSheet.userData = { actionId: 'contract' };
+    this.actionPickables.push(this.contractSheet);
     this.contractGroup.add(this.contractSheet);
 
     this.keyGroup = new THREE.Group();
     this.keyGroup.position.set(0.65, 0.15, 0.2);
-    var keyMat = new THREE.MeshStandardMaterial({ color: 0xdfb151, roughness: 0.28, metalness: 0.65 });
+    var keyMat = new THREE.MeshStandardMaterial({ color: 0xdfb151, roughness: 0.25, metalness: 0.68 });
     var keyRing = new THREE.Mesh(new THREE.TorusGeometry(0.24, 0.06, 10, 20), keyMat);
     var keyShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.72, 10), keyMat);
     keyShaft.rotation.z = Math.PI / 2;
@@ -613,7 +865,7 @@
     this.contractGroup.add(this.keyGroup);
     this.flowPropsGroup.add(this.contractGroup);
 
-    // Step 3: QRIS Billing Card + Animated Pulse Arc to K-202
+    // Step 3: Clickable 3D QRIS Plaque + Pulse Flow Tube to K-202
     this.billingGroup = new THREE.Group();
     this.billingGroup.visible = false;
 
@@ -622,12 +874,14 @@
       roughness: 0.4,
       side: THREE.DoubleSide
     });
-    this.qrisCard = new THREE.Mesh(new THREE.PlaneGeometry(1.46, 1.6), this.qrisMat);
+    this.qrisCard = new THREE.Mesh(new THREE.PlaneGeometry(1.5, 1.65), this.qrisMat);
     this.qrisCard.position.set(0.0, 5.75, 1.15);
+    this.qrisCard.userData = { actionId: 'qris' };
+    this.actionPickables.push(this.qrisCard);
     this.billingGroup.add(this.qrisCard);
 
     this.billingCurve = new THREE.QuadraticBezierCurve3(
-      new THREE.Vector3(-4.0, 1.35, 1.85),
+      new THREE.Vector3(-3.95, 1.35, 1.85),
       new THREE.Vector3(-2.1, 4.85, 3.05),
       new THREE.Vector3(0.0, 4.85, 1.25)
     );
@@ -653,7 +907,7 @@
     }
     this.flowPropsGroup.add(this.billingGroup);
 
-    // Step 4: Complaint Beacon above K-103
+    // Step 4: Clickable Complaint Beacon above K-103
     this.complaintGroup = new THREE.Group();
     this.complaintGroup.position.set(3.2, 2.55, 0.85);
     this.complaintGroup.visible = false;
@@ -666,14 +920,16 @@
     this.complaintGroup.add(this.complaintRing);
 
     this.complaintCore = new THREE.Mesh(
-      new THREE.OctahedronGeometry(0.36, 0),
+      new THREE.OctahedronGeometry(0.38, 0),
       new THREE.MeshStandardMaterial({ color: 0xc4542d, emissive: 0xc4542d, emissiveIntensity: 0.45, roughness: 0.3 })
     );
     this.complaintCore.position.y = 0.62;
+    this.complaintCore.userData = { actionId: 'complaint' };
+    this.actionPickables.push(this.complaintCore);
     this.complaintGroup.add(this.complaintCore);
     this.flowPropsGroup.add(this.complaintGroup);
 
-    // Step 5: Rooftop 3D Financial Growth Bars cleanly seated on rear roofDeck
+    // Step 5: Rooftop 3D Financial Growth Bars
     this.financeGroup = new THREE.Group();
     this.financeGroup.position.set(-1.35, 5.32, -0.88);
     this.financeGroup.visible = false;
@@ -762,9 +1018,13 @@
       entry.frontStripMat.emissive.setHex(targetColor);
 
       var isSelected = self.selectedRoomId === room.id;
-      entry.floorPadMat.emissive.setHex(isSelected ? meta.color : 0x000000);
-      entry.floorPadMat.emissiveIntensity = isSelected ? 0.35 : 0;
-      entry.selectFrame.material.opacity = isSelected ? 0.95 : 0;
+      var isHovered = self.hoveredRoomId === room.id;
+      entry.floorPadMat.emissive.setHex(isSelected || isHovered ? meta.color : 0x000000);
+      entry.floorPadMat.emissiveIntensity = isSelected ? 0.36 : isHovered ? 0.22 : 0;
+      entry.selectFrame.material.opacity = isSelected ? 0.95 : isHovered ? 0.45 : 0;
+
+      // Open door smoothly for selected room!
+      entry.doorTargetAngle = isSelected ? 1.32 : 0.22;
 
       var pin = self.pinElements[room.id];
       if (pin) {
@@ -773,6 +1033,27 @@
         if (dot) {
           dot.className = 'pin-dot ' + (showManualChaos ? 'pin-repair' : meta.pinClass);
         }
+      }
+    });
+
+    this._syncNightGlow();
+  };
+
+  Kosan3DViewer.prototype._syncNightGlow = function () {
+    if (!this.nightGlowMats) return;
+    var self = this;
+    var statusMap = {};
+    this.roomsState.forEach(function (r) {
+      statusMap[r.id] = r.status;
+    });
+
+    this.nightGlowMats.forEach(function (item) {
+      if (item.roomId) {
+        var st = statusMap[item.roomId];
+        var lit = self.isNightMode && (st === 'occupied' || self.selectedRoomId === item.roomId);
+        item.mat.emissiveIntensity = lit ? item.night : item.day;
+      } else {
+        item.mat.emissiveIntensity = self.isNightMode ? item.night : item.day;
       }
     });
   };
@@ -785,7 +1066,7 @@
     this.roomsState.forEach(function (r) {
       if (r.status === 'occupied') {
         occupiedCount++;
-        if (r.billingStatus === 'Lunas') paidIncome += r.price;
+        if (r.billingStatus === 'Lunas' || r.billingStatus === 'Lunas Bulan Pertama') paidIncome += r.price;
         else pendingIncome += r.price;
       } else if (r.status === 'booked') {
         pendingIncome += r.price * 0.3;
@@ -846,6 +1127,11 @@
       this.complaintRing.material.emissive.setHex(stageColor);
     }
 
+    var showDrops = this.simState.complaintStage !== 'done';
+    this.waterDrops.forEach(function (d) {
+      d.visible = showDrops;
+    });
+
     this._syncFinanceBars();
   };
 
@@ -869,6 +1155,39 @@
     this._syncStepProps();
   };
 
+  Kosan3DViewer.prototype.setNightMode = function (enabled) {
+    this.isNightMode = !!enabled;
+    var shell = this.canvas.parentElement;
+    if (shell) shell.classList.toggle('is-night', this.isNightMode);
+    if (this.fallbackMode) {
+      this._drawFallback2D();
+      return;
+    }
+
+    if (this.isNightMode) {
+      this.hemiLight.intensity = 0.36;
+      this.hemiLight.color.setHex(0x88a8c9);
+      this.sunLight.intensity = 0.28;
+      this.sunLight.color.setHex(0xa8c3e8);
+      this.warmNightLight.intensity = 0.72;
+    } else {
+      this.hemiLight.intensity = 0.92;
+      this.hemiLight.color.setHex(0xfffcf2);
+      this.sunLight.intensity = 1.12;
+      this.sunLight.color.setHex(0xfff4e0);
+      this.warmNightLight.intensity = 0;
+    }
+    this._syncNightGlow();
+  };
+
+  Kosan3DViewer.prototype.setRoofClosed = function (closed) {
+    this.isRoofClosed = !!closed;
+    if (this.fallbackMode) return;
+    if (this.closedRoofGroup) {
+      this.closedRoofGroup.visible = this.isRoofClosed && (this.floorFilter === 'all' || this.floorFilter === 'roof');
+    }
+  };
+
   Kosan3DViewer.prototype.setFloorFilter = function (floor) {
     this.floorFilter = floor;
     if (this.fallbackMode) {
@@ -878,8 +1197,26 @@
     this.floor1Group.visible = true;
     this.floor2Group.visible = floor === 'all' || floor === '2' || floor === 'roof';
     this.roofGroup.visible = floor === 'all' || floor === 'roof';
+    this.closedRoofGroup.visible = this.isRoofClosed && (floor === 'all' || floor === 'roof');
     this.camTarget = Object.assign({}, this._getCameraPreset());
     this._syncStepProps();
+  };
+
+  Kosan3DViewer.prototype.focusRoom = function (roomId) {
+    var layout = ROOM_LAYOUT.find(function (l) {
+      return l.id === roomId;
+    });
+    if (!layout) return;
+    this.selectRoom(roomId);
+    if (this.fallbackMode) return;
+    this.camTarget = {
+      theta: layout.x < 0 ? 0.42 : layout.x > 0 ? -0.35 : 0.15,
+      phi: 0.96,
+      radius: 8.8,
+      tx: layout.x,
+      ty: layout.y + 1.05,
+      tz: 0.25
+    };
   };
 
   Kosan3DViewer.prototype.setSimState = function (patch) {
@@ -896,14 +1233,23 @@
     this._syncRoomsVisuals();
   };
 
+  Kosan3DViewer.prototype.rotateBy = function (deltaTheta) {
+    if (this.fallbackMode) {
+      this.fallbackYaw += deltaTheta;
+      this._drawFallback2D();
+      return;
+    }
+    this.camTarget.theta += deltaTheta;
+  };
+
   Kosan3DViewer.prototype.zoomBy = function (delta) {
     if (this.fallbackMode) return;
-    this.camTarget.radius = Math.min(24, Math.max(8.5, this.camTarget.radius + delta));
+    this.camTarget.radius = Math.min(24, Math.max(7.6, this.camTarget.radius + delta));
   };
 
   Kosan3DViewer.prototype.resetCamera = function () {
     if (this.fallbackMode) {
-      this.fallbackYaw = 0.62;
+      this.fallbackYaw = 0.52;
       this._drawFallback2D();
       return;
     }
@@ -927,22 +1273,28 @@
     });
 
     global.addEventListener('pointermove', function (e) {
-      if (!dragState.active) return;
-      var dx = e.clientX - dragState.lastX;
-      var dy = e.clientY - dragState.lastY;
-      dragState.moved += Math.hypot(dx, dy);
-      dragState.lastX = e.clientX;
-      dragState.lastY = e.clientY;
+      if (dragState.active) {
+        var dx = e.clientX - dragState.lastX;
+        var dy = e.clientY - dragState.lastY;
+        dragState.moved += Math.hypot(dx, dy);
+        dragState.lastX = e.clientX;
+        dragState.lastY = e.clientY;
 
-      self.camTarget.theta -= dx * 0.0085;
-      self.camTarget.phi = Math.min(1.36, Math.max(0.42, self.camTarget.phi - dy * 0.0055));
+        self.camTarget.theta -= dx * 0.0085;
+        self.camTarget.phi = Math.min(1.36, Math.max(0.42, self.camTarget.phi - dy * 0.0055));
+        return;
+      }
+
+      if (self.isVisible) {
+        self._hoverAt(e.clientX, e.clientY);
+      }
     });
 
     global.addEventListener('pointerup', function (e) {
       if (!dragState.active) return;
       dragState.active = false;
       if (dragState.moved < 7) {
-        self._pickRoomAt(e.clientX, e.clientY);
+        self._pickAt(e.clientX, e.clientY);
       }
     });
 
@@ -956,25 +1308,59 @@
     global.addEventListener('resize', this._onResize);
   };
 
-  Kosan3DViewer.prototype._pickRoomAt = function (clientX, clientY) {
+  Kosan3DViewer.prototype._raycast = function (clientX, clientY, targets) {
     var rect = this.canvas.getBoundingClientRect();
     if (clientX < rect.left || clientX > rect.right || clientY < rect.top || clientY > rect.bottom) {
-      return;
+      return [];
     }
     this.pointerNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
     this.pointerNDC.y = -((clientY - rect.top) / rect.height) * 2 + 1;
-
     this.raycaster.setFromCamera(this.pointerNDC, this.camera);
-    var activePickables = this.pickables.filter(function (mesh) {
+    return this.raycaster.intersectObjects(targets, false);
+  };
+
+  Kosan3DViewer.prototype._getActiveTargets = function () {
+    var activeActions = this.actionPickables.filter(function (mesh) {
+      return mesh.parent && mesh.parent.visible;
+    });
+    var activeRooms = this.pickables.filter(function (mesh) {
       return mesh.parent && mesh.parent.parent && mesh.parent.parent.visible;
     });
-    var hits = this.raycaster.intersectObjects(activePickables, false);
+    return { actions: activeActions, rooms: activeRooms };
+  };
+
+  Kosan3DViewer.prototype._hoverAt = function (clientX, clientY) {
+    var targets = this._getActiveTargets();
+    var hits = this._raycast(clientX, clientY, targets.actions.concat(targets.rooms));
     if (hits.length > 0) {
-      var roomId = hits[0].object.userData.roomId;
-      if (roomId) {
-        this.selectRoom(roomId);
-        this.onRoomSelect(roomId);
+      this.canvas.style.cursor = 'pointer';
+      var hoveredId = hits[0].object.userData.roomId || null;
+      if (hoveredId !== this.hoveredRoomId) {
+        this.hoveredRoomId = hoveredId;
+        this._syncRoomsVisuals();
       }
+    } else {
+      this.canvas.style.cursor = 'grab';
+      if (this.hoveredRoomId !== null) {
+        this.hoveredRoomId = null;
+        this._syncRoomsVisuals();
+      }
+    }
+  };
+
+  Kosan3DViewer.prototype._pickAt = function (clientX, clientY) {
+    var targets = this._getActiveTargets();
+    var actionHits = this._raycast(clientX, clientY, targets.actions);
+    if (actionHits.length > 0 && actionHits[0].object.userData.actionId) {
+      this.onPropAction(actionHits[0].object.userData.actionId);
+      return;
+    }
+
+    var roomHits = this._raycast(clientX, clientY, targets.rooms);
+    if (roomHits.length > 0 && roomHits[0].object.userData.roomId) {
+      var roomId = roomHits[0].object.userData.roomId;
+      this.selectRoom(roomId);
+      this.onRoomSelect(roomId);
     }
   };
 
@@ -1050,10 +1436,10 @@
       var t = (now - self.clockStart) * 0.001;
 
       if (self.mode === 'hero') {
-        self.camTarget.theta += 0.0012;
+        self.camTarget.theta += 0.001;
       }
 
-      var k = 0.09;
+      var k = 0.095;
       self.camCurrent.theta += (self.camTarget.theta - self.camCurrent.theta) * k;
       self.camCurrent.phi += (self.camTarget.phi - self.camCurrent.phi) * k;
       self.camCurrent.radius += (self.camTarget.radius - self.camCurrent.radius) * k;
@@ -1073,7 +1459,26 @@
       );
       self.camera.lookAt(self.camCurrent.tx, self.camCurrent.ty, self.camCurrent.tz);
 
-      // Step 2: Contract & Key float + billboard contract sheet toward camera
+      // Animate swinging room doors smoothly
+      ROOM_LAYOUT.forEach(function (layout) {
+        var entry = self.roomMeshes[layout.id];
+        if (entry && entry.doorPivot) {
+          entry.doorPivot.rotation.y += (entry.doorTargetAngle - entry.doorPivot.rotation.y) * 0.12;
+        }
+      });
+
+      // Animate exterior AC condenser fans
+      self.acFans.forEach(function (fan) {
+        fan.rotation.z = t * 8.0;
+      });
+
+      // Animate dripping water droplets on K-103 leaky faucet
+      self.waterDrops.forEach(function (drop) {
+        if (!drop.visible) return;
+        var prog = (t * 1.15 + drop.userData.phase) % 1;
+        drop.position.y = 0.9 - prog * 0.25;
+      });
+
       if (self.contractGroup && self.contractGroup.visible) {
         self.contractGroup.position.y = 5.75 + Math.sin(t * 2.1) * 0.12;
         self.contractSheet.lookAt(self.camera.position.x, self.contractGroup.position.y + 0.25, self.camera.position.z);
@@ -1081,7 +1486,6 @@
         self.keyGroup.position.y = self.simState.contractConfirmed ? -1.45 : 0.15 + Math.cos(t * 2.4) * 0.08;
       }
 
-      // Step 3: QRIS plaque float + billboard + animated pulse spheres
       if (self.billingGroup && self.billingGroup.visible) {
         self.qrisCard.position.y = 5.75 + Math.sin(t * 2.0) * 0.12;
         self.qrisCard.lookAt(self.camera.position.x, self.qrisCard.position.y, self.camera.position.z);
@@ -1094,7 +1498,6 @@
         });
       }
 
-      // Step 4: Complaint pulsing beacon
       if (self.complaintGroup && self.complaintGroup.visible) {
         self.complaintCore.rotation.y = t * 2.2;
         self.complaintCore.position.y = 0.65 + Math.sin(t * 3.0) * 0.1;
@@ -1102,7 +1505,6 @@
         self.complaintRing.scale.set(pulseScale, pulseScale, 1);
       }
 
-      // Hero Manual mode floating chaos
       if (self.manualChaosGroup && self.manualChaosGroup.visible) {
         self.chaosItems.forEach(function (item) {
           item.position.y = item.userData.baseY + Math.sin(t * 2.3 + item.userData.phase) * 0.18;
@@ -1116,7 +1518,6 @@
     this.rafId = global.requestAnimationFrame(tick);
   };
 
-  /* Graceful 2D-Projected Isometric 3D Canvas Fallback (works offline without Three.js CDN) */
   Kosan3DViewer.prototype._initFallback2D = function () {
     this.fallbackMode = true;
     this.fallbackYaw = 0.52;
@@ -1190,7 +1591,7 @@
       ctx.lineTo(b4.x, b4.y);
       ctx.closePath();
       ctx.fill();
-      ctx.strokeStyle = 'rgba(23,48,40,0.25)';
+      ctx.strokeStyle = 'rgba(27,36,32,0.25)';
       ctx.stroke();
 
       ctx.fillStyle = topCol;
@@ -1224,7 +1625,7 @@
         return r.id === layout.id;
       });
       var meta = STATUS_META[(st && st.status) || 'ready'];
-      drawBlock(layout.x, layout.y, layout.z, 2.7, 1.85, 2.8, '#faf7f0', meta.hex);
+      drawBlock(layout.x, layout.y, layout.z, 2.7, 1.85, 2.8, '#faf8f3', meta.hex);
 
       if (pin) {
         var pt = project(layout.x, layout.y + 2.05, layout.z);

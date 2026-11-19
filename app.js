@@ -12,14 +12,14 @@
     1: { hudTitle: 'Data Kamar & Pemesanan Terpusat', focusRoom: 'K-102' },
     2: { hudTitle: 'Kontrak Sewa Digital & Serah Terima Kunci', focusRoom: 'K-201' },
     3: { hudTitle: 'Penagihan Tanpa Canggung & QRIS', focusRoom: 'K-202' },
-    4: { hudTitle: 'Alur Pengaduan 3-Status Terukur', focusRoom: 'K-103' },
+    4: { hudTitle: 'Alur Pengaduan 3 Status Terukur', focusRoom: 'K-103' },
     5: { hudTitle: 'Laporan Keuangan & Statistik Hunian', focusRoom: 'K-101' }
   };
 
   var ROLES_DATA = {
     admin: {
       tag: 'RUANG DATA TERPISAH & AMAN',
-      title: 'Admin Kos — Pusat Kendali Operasional Properti',
+      title: 'Admin Kos: Pusat Kendali Operasional Properti',
       scope: 'Isolasi Data Per Properti',
       desc: 'Mengelola kamar, data penghuni, pemesanan, kontrak sewa digital, tagihan, pembayaran, pengaduan, dan laporan keuangan di ruang data yang terpisah dan aman.',
       capabilities: [
@@ -31,7 +31,7 @@
     },
     penghuni: {
       tag: 'AKSES MANDIRI PENGHUNI',
-      title: 'Penghuni Kos — Transparansi Kontrak, Tagihan, & Keluhan',
+      title: 'Penghuni Kos: Transparansi Kontrak, Tagihan, & Keluhan',
       scope: 'Akun Penghuni Pribadi',
       desc: 'Mengakses informasi kamar, melihat kontrak sewa digital, memantau tagihan dan riwayat pembayaran, serta mengirim laporan pengaduan langsung tanpa canggung.',
       capabilities: [
@@ -43,11 +43,11 @@
     },
     superadmin: {
       tag: 'INFRASTRUKTUR PLATFORM SAAS',
-      title: 'Super Admin — Penjaga Keandalan Sistem Terpusat',
+      title: 'Super Admin: Penjaga Keandalan Sistem Terpusat',
       scope: 'Manajemen Platform SaaS',
       desc: 'Menjaga keandalan infrastruktur platform SaaS, mengelola akun Admin Kos, dan memantau sistem secara terpusat agar setiap properti kos berjalan stabil.',
       capabilities: [
-        'Memastikan infrastruktur cloud dan ketersediaan layanan tetap andal bagi seluruh pengelola kos',
+        'Memastikan infrastruktur layanan tetap andal bagi seluruh pengelola rumah kos',
         'Mengelola pendaftaran dan aktivasi akun Admin Kos baru dengan isolasi data yang aman',
         'Memantau kesehatan dan keamanan sistem secara terpusat tanpa mencampur privasi data penghuni'
       ]
@@ -187,7 +187,7 @@
     rooms.forEach(function (r) {
       if (r.status === 'occupied') {
         occupiedCount++;
-        if (r.billingStatus === 'Lunas') {
+        if (r.billingStatus === 'Lunas' || r.billingStatus === 'Lunas Bulan Pertama') {
           income += r.price;
         } else {
           pending += r.price;
@@ -219,7 +219,6 @@
     currentStep = Math.min(5, Math.max(1, stepNum));
     var meta = STEP_META[currentStep];
 
-    // Update desktop cards
     document.querySelectorAll('.step-card').forEach(function (card) {
       var isTarget = Number(card.getAttribute('data-step')) === currentStep;
       card.classList.toggle('is-active', isTarget);
@@ -227,21 +226,18 @@
       if (trigger) trigger.setAttribute('aria-expanded', String(isTarget));
     });
 
-    // Update mobile tabs
     document.querySelectorAll('[data-step-tab]').forEach(function (tab) {
       var isTarget = Number(tab.getAttribute('data-step-tab')) === currentStep;
       tab.classList.toggle('is-active', isTarget);
       tab.setAttribute('aria-selected', String(isTarget));
     });
 
-    // Update HUD & footer navigation
     document.getElementById('hud-step-num').textContent = 'LANGKAH 0' + currentStep;
     document.getElementById('hud-step-title').textContent = meta.hudTitle;
     document.getElementById('step-counter').textContent = 'Langkah ' + currentStep + ' dari 5';
     document.getElementById('step-prev-btn').disabled = currentStep === 1;
     document.getElementById('step-next-btn').disabled = currentStep === 5;
 
-    // Reset floor filter to 'all' unless step 5
     document.querySelectorAll('.floor-btn').forEach(function (btn) {
       var targetFloor = currentStep === 5 ? 'roof' : 'all';
       btn.classList.toggle('is-active', btn.getAttribute('data-floor') === targetFloor);
@@ -304,6 +300,29 @@
       });
     }
 
+    // Hero Night Mode & Roof Cutaway toggles
+    var heroLightBtn = document.getElementById('hero-lighting-btn');
+    var heroNight = false;
+    if (heroLightBtn && heroViewer) {
+      heroLightBtn.addEventListener('click', function () {
+        heroNight = !heroNight;
+        heroViewer.setNightMode(heroNight);
+        heroLightBtn.setAttribute('aria-pressed', String(heroNight));
+        heroLightBtn.textContent = heroNight ? 'Mode Siang' : 'Mode Malam';
+      });
+    }
+
+    var heroRoofBtn = document.getElementById('hero-roof-btn');
+    var heroRoofClosed = false;
+    if (heroRoofBtn && heroViewer) {
+      heroRoofBtn.addEventListener('click', function () {
+        heroRoofClosed = !heroRoofClosed;
+        heroViewer.setRoofClosed(heroRoofClosed);
+        heroRoofBtn.setAttribute('aria-pressed', String(heroRoofClosed));
+        heroRoofBtn.textContent = heroRoofClosed ? 'Buka Potongan' : 'Tutup Atap';
+      });
+    }
+
     // Hero Manual vs Digital switch
     var modeNote = document.getElementById('hero-mode-note');
     document.querySelectorAll('[data-hero-mode]').forEach(function (btn) {
@@ -319,7 +338,7 @@
           modeNote.innerHTML =
             mode === 'manual'
               ? '<strong>Cara Manual:</strong> Bon kertas, foto KTP, tagihan chat, dan laporan keluhan tercecer sehingga status kamar sulit dipantau cepat.'
-              : '<strong>Alur Digital:</strong> Status 6 kamar, kontrak, tagihan QRIS, dan keluhan terpantau dalam satu dasbor terpusat.';
+              : '<strong>Alur Digital:</strong> Status setiap kamar, kontrak, tagihan, dan keluhan terbaca langsung dari satu pusat kendali.';
         }
       });
     });
@@ -335,6 +354,20 @@
         initialRooms: rooms,
         onRoomSelect: function (roomId) {
           renderInspector(roomId);
+        },
+        onPropAction: function (actionId) {
+          if (actionId === 'contract') {
+            document.getElementById('sim-contract-k201').click();
+          } else if (actionId === 'qris') {
+            document.getElementById('sim-pay-k202').click();
+          } else if (actionId === 'complaint') {
+            var order = ['reported', 'processing', 'done'];
+            var currentBtn = document.querySelector('[data-complaint-stage].is-current');
+            var cur = currentBtn ? currentBtn.getAttribute('data-complaint-stage') : 'reported';
+            var next = order[(order.indexOf(cur) + 1) % order.length];
+            var nextBtn = document.querySelector('[data-complaint-stage="' + next + '"]');
+            if (nextBtn) nextBtn.click();
+          }
         }
       });
     }
@@ -350,6 +383,21 @@
       });
     });
 
+    var studioLightBtn = document.getElementById('studio-lighting-btn');
+    var studioNight = false;
+    studioLightBtn.addEventListener('click', function () {
+      studioNight = !studioNight;
+      if (studioViewer) studioViewer.setNightMode(studioNight);
+      studioLightBtn.setAttribute('aria-pressed', String(studioNight));
+      studioLightBtn.textContent = studioNight ? 'Siang' : 'Malam';
+    });
+
+    document.getElementById('studio-rot-left').addEventListener('click', function () {
+      if (studioViewer) studioViewer.rotateBy(-0.55);
+    });
+    document.getElementById('studio-rot-right').addEventListener('click', function () {
+      if (studioViewer) studioViewer.rotateBy(0.55);
+    });
     document.getElementById('studio-zoom-in').addEventListener('click', function () {
       if (studioViewer) studioViewer.zoomBy(-2.0);
     });
@@ -358,6 +406,11 @@
     });
     document.getElementById('studio-reset-cam').addEventListener('click', function () {
       if (studioViewer) studioViewer.resetCamera();
+    });
+    document.getElementById('insp-focus-btn').addEventListener('click', function () {
+      if (studioViewer && selectedStudioRoom) {
+        studioViewer.focusRoom(selectedStudioRoom);
+      }
     });
 
     // Step Triggers
@@ -383,7 +436,6 @@
   }
 
   function setupSimulations() {
-    // Step 1 Simulation: Book K-102
     var bookBtn = document.getElementById('sim-book-k102');
     var fb1 = document.getElementById('feedback-step-1');
     bookBtn.addEventListener('click', function () {
@@ -395,7 +447,7 @@
         k102.billingStatus = 'Uang Muka Tercatat';
         k102.contractState = 'Menunggu konfirmasi kontrak';
         bookBtn.textContent = 'Reset Status K-102 (Siap Huni)';
-        fb1.textContent = 'Berhasil! K-102 langsung berubah menjadi Dalam tahap pemesanan sehingga terhindar dari terjual ganda.';
+        fb1.textContent = 'Berhasil! K-102 langsung berubah menjadi Dalam tahap pemesanan sehingga terhindar dari kamar terjual ganda.';
       } else {
         k102.status = 'ready';
         k102.tenant = 'Belum ada penghuni';
@@ -409,7 +461,6 @@
       syncAllViewers();
     });
 
-    // Step 2 Simulation: Confirm Digital Contract & Key Handover on K-201
     var contractBtn = document.getElementById('sim-contract-k201');
     var fb2 = document.getElementById('feedback-step-2');
     var contractDone = false;
@@ -423,7 +474,7 @@
         k201.billingStatus = 'Lunas Bulan Pertama';
         k201.contractState = 'Kontrak Digital Terkonfirmasi';
         contractBtn.textContent = 'Reset Simulasi Kontrak (K-201)';
-        fb2.textContent = 'Kontrak digital terkonfirmasi & kunci diserahkan! Status K-201 berubah menjadi Terisi.';
+        fb2.textContent = 'Kontrak digital terkonfirmasi dan kunci diserahkan. Status K-201 berubah menjadi Terisi.';
       } else {
         k201.status = 'booked';
         k201.tenant = 'Nadia Kusuma (Masuk tgl 1)';
@@ -440,7 +491,6 @@
       syncAllViewers();
     });
 
-    // Step 3 Simulation: Send Reminder & QRIS Payment on K-202
     var remindBtn = document.getElementById('sim-remind-k202');
     var payBtn = document.getElementById('sim-pay-k202');
     var fb3 = document.getElementById('feedback-step-3');
@@ -448,7 +498,7 @@
 
     remindBtn.addEventListener('click', function () {
       activateStep(3);
-      fb3.textContent = 'Pengingat jatuh tempo resmi dikirim sistem ke akun Penghuni Kos K-202 — tanpa rasa canggung!';
+      fb3.textContent = 'Pengingat jatuh tempo resmi dikirim sistem ke akun Penghuni Kos K-202 tanpa rasa canggung.';
       if (studioViewer) {
         studioViewer.selectRoom('K-202');
       }
@@ -463,7 +513,7 @@
       if (paidDone) {
         k202.billingStatus = 'Lunas';
         payBtn.textContent = 'Reset Tagihan K-202';
-        fb3.textContent = 'Pembayaran QRIS Rp 1.950.000 otomatis tercatat Lunas dan langsung masuk ke laporan keuangan!';
+        fb3.textContent = 'Pembayaran QRIS Rp 1.950.000 otomatis tercatat Lunas dan langsung masuk ke laporan keuangan.';
       } else {
         k202.billingStatus = 'Menunggu Pembayaran (H-2)';
         payBtn.textContent = 'Simulasi Bayar QRIS (K-202)';
@@ -477,7 +527,6 @@
       syncAllViewers();
     });
 
-    // Step 4 Simulation: 3-stage complaint resolution on K-103
     var fb4 = document.getElementById('feedback-step-4');
     document.querySelectorAll('[data-complaint-stage]').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -492,17 +541,17 @@
             k103.status = 'repair';
             k103.billingStatus = 'Tiket #ADU-04: Baru Dilaporkan';
             k103.contractState = 'Menunggu respon Admin Kos';
-            fb4.textContent = 'Tahap 1: Penghuni melapor keran air bocor melalui aplikasi tanpa chat tenggelam.';
+            fb4.textContent = 'Tahap 1: Penghuni melapor keran air bocor melalui aplikasi tanpa tertimbun chat.';
           } else if (stage === 'processing') {
             k103.status = 'repair';
             k103.billingStatus = 'Tiket #ADU-04: Sedang Diproses';
             k103.contractState = 'Teknisi ditugaskan Admin Kos';
-            fb4.textContent = 'Tahap 2: Admin Kos memperbarui status menjadi Sedang Diproses — penghuni merasa tenang.';
+            fb4.textContent = 'Tahap 2: Admin Kos memperbarui status menjadi Sedang Diproses agar penghuni merasa tenang.';
           } else {
             k103.status = 'ready';
             k103.billingStatus = 'Riwayat Perawatan Tersimpan';
             k103.contractState = 'Siap dihuni · Terdokumentasi';
-            fb4.textContent = 'Tahap 3: Perbaikan selesai & riwayat perawatan Kamar 103 terdokumentasi rapi!';
+            fb4.textContent = 'Tahap 3: Keran selesai diperbaiki, tetesan berhenti, dan riwayat perawatan K-103 terdokumentasi rapi.';
           }
         }
 
