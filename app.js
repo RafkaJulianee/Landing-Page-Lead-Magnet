@@ -219,7 +219,7 @@
     currentStep = Math.min(5, Math.max(1, stepNum));
     var meta = STEP_META[currentStep];
 
-    document.querySelectorAll('.step-card').forEach(function (card) {
+    document.querySelectorAll('.step-item').forEach(function (card) {
       var isTarget = Number(card.getAttribute('data-step')) === currentStep;
       card.classList.toggle('is-active', isTarget);
       var trigger = card.querySelector('.step-trigger');
@@ -234,7 +234,7 @@
 
     document.getElementById('hud-step-num').textContent = 'LANGKAH 0' + currentStep;
     document.getElementById('hud-step-title').textContent = meta.hudTitle;
-    document.getElementById('step-counter').textContent = 'Langkah ' + currentStep + ' dari 5';
+    document.getElementById('step-counter').textContent = 'Langkah ' + currentStep + ' / 5';
     document.getElementById('step-prev-btn').disabled = currentStep === 1;
     document.getElementById('step-next-btn').disabled = currentStep === 5;
 
