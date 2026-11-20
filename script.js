@@ -288,6 +288,8 @@
     this.isVisible = true;
     this.rafId = null;
     this.clockStart = performance.now();
+    this.pinElements = {};
+    this.roomMeshes = {};
 
     if (!global.THREE) {
       this._initFallback2D();
@@ -1306,6 +1308,10 @@
     this.activeStep = stepNumber;
     if (focusRoomId) {
       this.selectedRoomId = focusRoomId;
+    }
+    if (this.fallbackMode) {
+      this._drawFallback2D();
+      return;
     }
     this.camTarget = Object.assign({}, this._getCameraPreset());
     this._syncRoomsVisuals();
