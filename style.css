@@ -33,6 +33,10 @@
   box-sizing: border-box;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 84px;
@@ -1511,108 +1515,51 @@ p {
 .form-intro {
   margin-top: 10px;
   margin-bottom: 22px;
-  font-size: 0.93rem;
+  font-size: 0.94rem;
   color: var(--text-muted);
 }
 
-.form-field {
-  margin-bottom: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.form-field label {
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.form-field input,
-.form-field select {
-  width: 100%;
-  padding: 11px 14px;
-  min-height: 44px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border-strong);
-  background: var(--bg-surface);
-  font-size: 0.94rem;
-}
-
-.form-field input:focus,
-.form-field select:focus {
-  border-color: var(--accent);
-  outline: none;
-}
-
-.form-error {
-  margin-bottom: 14px;
-  padding: 10px 12px;
-  border-radius: var(--radius-sm);
-  border: 1px solid rgba(184, 72, 37, 0.35);
-  background: rgba(184, 72, 37, 0.1);
-  color: var(--accent-hover);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.lead-loading-box {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 20px;
+.download-file-meta {
+  margin: 0 0 24px;
+  padding: 16px 18px;
   border-radius: var(--radius-md);
   background: var(--bg-surface);
   border: 1px solid var(--border-hairline);
-  font-size: 0.92rem;
-}
-
-.spinner {
-  width: 24px;
-  height: 24px;
-  flex: 0 0 24px;
-  border: 3px solid var(--bg-muted);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 750ms linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
-.lead-success-box {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.success-check {
-  width: 38px;
-  height: 38px;
-  border-radius: var(--radius-sm);
-  background: var(--teal);
-  color: #ffffff;
-  display: grid;
-  place-items: center;
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-.success-actions {
+.download-file-meta > div {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
+  gap: 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-hairline);
 }
 
-.text-reset-btn {
-  align-self: flex-start;
-  border: 0;
-  background: transparent;
+.download-file-meta > div:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.download-file-meta dt {
+  font-size: 0.76rem;
+  font-weight: 600;
   color: var(--text-muted);
-  text-decoration: underline;
-  font-size: 0.84rem;
-  cursor: pointer;
-  padding: 4px 0;
+}
+
+.download-file-meta dd {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.download-action-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 /* Reader Modal (Accessible Escape & Focus Management per R-32) */

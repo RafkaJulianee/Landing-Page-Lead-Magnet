@@ -2546,111 +2546,13 @@
     });
   }
 
-  function buildDownloadDocument(name, roomsRange) {
-    var lines = [
-      'PANDUAN MENGELOLA RUMAH KOS SECARA MODERN DAN EFISIEN',
-      'Disiapkan untuk: ' + name + ' (Skala Properti: ' + roomsRange + ' Kamar)',
-      '=========================================================================',
-      ''
-    ];
-
-    FULL_GUIDE_PARAGRAPHS.forEach(function (item) {
-      if (item.heading) {
-        lines.push(item.heading.toUpperCase());
-      }
-      if (item.body) {
-        lines.push(item.body);
-      }
-      if (item.quote) {
-        lines.push('>> ' + item.quote);
-      }
-      lines.push('');
-    });
-
-    lines.push('CHECKLIST PRAKTIS TRANSISI DIGITAL RUMAH KOS');
-    lines.push('1. Rapikan daftar kamar: nomor kamar, tipe, tarif sewa, dan daftar fasilitas.');
-    lines.push('2. Tetapkan 4 status kamar: Terisi | Kosong siap huni | Dalam tahap pemesanan | Sedang diperbaiki.');
-    lines.push('3. Lengkapi data penghuni aktif: nama lengkap, kontak darurat, identitas diri, tanggal masuk, jatuh tempo.');
-    lines.push('4. Biasakan konfirmasi kontrak sewa digital SEBELUM kunci kamar diserahkan.');
-    lines.push('5. Aktifkan pengingat jatuh tempo otomatis dan sediakan QRIS atau transfer bank.');
-    lines.push('6. Jalankan alur pengaduan: Dilaporkan Penghuni -> Diproses Admin Kos -> Selesai & Terdokumentasi.');
-    lines.push('7. Pisahkan rekening operasional kos dari rekening pribadi untuk memantau arus kas bersih.');
-
-    return lines.join('\n');
-  }
-
-  function setupLeadMagnetForm() {
-    var form = document.getElementById('lead-magnet-form');
-    var errorEl = document.getElementById('lead-form-error');
-    var loadingBox = document.getElementById('lead-loading-box');
-    var successBox = document.getElementById('lead-success-box');
-    var successMsg = document.getElementById('lead-success-msg');
-    var downloadBtn = document.getElementById('download-checklist-btn');
-    var printBtn = document.getElementById('print-guide-btn');
-    var resetBtn = document.getElementById('reset-form-btn');
-
-    var latestLead = { name: 'Pengelola Kos', rooms: '5-10' };
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var nameVal = document.getElementById('lead-name').value.trim();
-      var contactVal = document.getElementById('lead-contact').value.trim();
-      var roomsVal = document.getElementById('lead-rooms').value;
-
-      if (nameVal.length < 2) {
-        errorEl.textContent = 'Mohon isi nama pemilik atau pengelola kos minimal 2 karakter.';
-        errorEl.hidden = false;
-        return;
-      }
-
-      if (contactVal.length < 5) {
-        errorEl.textContent = 'Mohon isi alamat email atau nomor WhatsApp yang valid.';
-        errorEl.hidden = false;
-        return;
-      }
-
-      errorEl.hidden = true;
-      latestLead = { name: nameVal, rooms: roomsVal, contact: contactVal };
-
-      form.hidden = true;
-      loadingBox.hidden = false;
-
-      setTimeout(function () {
-        loadingBox.hidden = true;
-        successBox.hidden = false;
-        successMsg.textContent =
-          'Terima kasih, ' +
-          nameVal +
-          '. Naskah lengkap panduan dan checklist transisi untuk skala ' +
-          roomsVal +
-          ' kamar siap Anda unduh atau cetak sekarang.';
-      }, 420);
-    });
-
-    downloadBtn.addEventListener('click', function () {
-      var content = buildDownloadDocument(latestLead.name, latestLead.rooms);
-      var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url;
-      a.download = 'Panduan-dan-Checklist-Kos-Modern.txt';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      setTimeout(function () {
-        URL.revokeObjectURL(url);
-      }, 500);
-    });
-
-    printBtn.addEventListener('click', function () {
-      window.print();
-    });
-
-    resetBtn.addEventListener('click', function () {
-      successBox.hidden = true;
-      loadingBox.hidden = true;
-      form.hidden = false;
-    });
+  function setupDirectPrintButton() {
+    var printBtn = document.getElementById('direct-print-btn');
+    if (printBtn) {
+      printBtn.addEventListener('click', function () {
+        window.print();
+      });
+    }
   }
 
   document.addEventListener('DOMContentLoaded', function () {
@@ -2659,7 +2561,7 @@
     setupSimulations();
     setupRoleSwitcher();
     setupReaderModal();
-    setupLeadMagnetForm();
+    setupDirectPrintButton();
     activateStep(1);
     renderFinancialLedger();
   });

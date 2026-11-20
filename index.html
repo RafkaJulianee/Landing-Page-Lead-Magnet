@@ -648,67 +648,39 @@
         </div>
 
         <div class="lead-form-card">
-          <span class="chapter-index">Lead Magnet Gratis</span>
-          <h2>Unduh Buku Panduan &amp; Checklist Transisi Kos</h2>
+          <span class="chapter-index">Unduh Buku Panduan</span>
+          <h2>Unduh Buku Panduan Pengelolaan Rumah Kos</h2>
           <p class="form-intro">
-            Isi data singkat di bawah ini untuk langsung mengunduh naskah lengkap panduan beserta checklist operasional praktis dalam format teks atau mencetaknya ke PDF.
+            Klik tombol di bawah ini untuk langsung mengunduh file dokumen lengkap panduan mengelola rumah kos secara modern dan efisien ke perangkat Anda.
           </p>
 
-          <form id="lead-magnet-form" novalidate>
-            <div class="form-field">
-              <label for="lead-name">Nama Pemilik atau Pengelola Kos</label>
-              <input
-                type="text"
-                id="lead-name"
-                name="name"
-                placeholder="Contoh: Ibu Ratna atau Pak Hendra"
-                required
-                autocomplete="name"
-              />
+          <dl class="download-file-meta">
+            <div>
+              <dt>Dokumen</dt>
+              <dd>Panduan Mengelola Rumah Kos Secara Modern dan Efisien</dd>
             </div>
-
-            <div class="form-field">
-              <label for="lead-contact">Email atau Nomor WhatsApp</label>
-              <input
-                type="text"
-                id="lead-contact"
-                name="contact"
-                placeholder="nama@email.com atau 0812xxxxxxxx"
-                required
-              />
+            <div>
+              <dt>Format File</dt>
+              <dd class="mono-data">Microsoft Word (.docx)</dd>
             </div>
-
-            <div class="form-field">
-              <label for="lead-rooms">Jumlah Kamar Kos Saat Ini</label>
-              <select id="lead-rooms" name="rooms" required>
-                <option value="5-10">5 hingga 10 Kamar</option>
-                <option value="11-25">11 hingga 25 Kamar</option>
-                <option value="26-50">26 hingga 50 Kamar</option>
-                <option value="50+">Lebih dari 50 Kamar</option>
-              </select>
+            <div>
+              <dt>Isi Materi</dt>
+              <dd>Operasional, Kontrak Digital, Penagihan, Pengaduan, &amp; Keuangan</dd>
             </div>
+          </dl>
 
-            <p class="form-error" id="lead-form-error" role="alert" hidden></p>
-
-            <button type="submit" class="btn btn-accent btn-lg btn-block" id="lead-submit-btn">
-              Siapkan Unduhan Panduan Gratis
+          <div class="download-action-stack">
+            <a
+              href="Panduan%20Mengelola%20Rumah%20Kos%20Secara%20Modern%20dan%20Efisien%20(1).docx"
+              download="Panduan Mengelola Rumah Kos Secara Modern dan Efisien.docx"
+              class="btn btn-accent btn-lg btn-block"
+              id="direct-download-docx"
+            >
+              Unduh Buku Panduan
+            </a>
+            <button type="button" class="btn btn-secondary btn-lg btn-block" id="direct-print-btn">
+              Cetak atau Simpan Ringkasan ke PDF
             </button>
-          </form>
-
-          <div class="lead-loading-box" id="lead-loading-box" hidden aria-live="polite">
-            <div class="spinner" aria-hidden="true"></div>
-            <p>Menyusun dokumen panduan lengkap dan checklist sesuai skala kamar kos Anda...</p>
-          </div>
-
-          <div class="lead-success-box" id="lead-success-box" hidden aria-live="polite">
-            <div class="success-check" aria-hidden="true">&#10003;</div>
-            <h3>Panduan dan Checklist Siap Diunduh</h3>
-            <p id="lead-success-msg"></p>
-            <div class="success-actions">
-              <button type="button" class="btn btn-accent" id="download-checklist-btn">Unduh Naskah &amp; Checklist (.txt)</button>
-              <button type="button" class="btn btn-secondary" id="print-guide-btn">Cetak atau Simpan PDF</button>
-            </div>
-            <button type="button" class="text-reset-btn" id="reset-form-btn">Ubah data pengelola</button>
           </div>
         </div>
       </div>
