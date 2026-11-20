@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panduan Mengelola Rumah Kos Secara Modern dan Efisien</title>
+  <meta
+    name="description"
+    content="Langkah praktis menata operasional, penagihan, kontrak sewa digital, pengaduan penghuni, dan laporan keuangan rumah kos dengan visualisasi model 3D interaktif."
+  />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <a class="skip-link" href="#simulasi-3d">Langsung ke Simulasi 3D Operasional Kos</a>
+
+  <header class="site-header" id="site-header">
+    <div class="container header-inner">
+      <a href="#beranda" class="brand" aria-label="Beranda Panduan Kos Modern">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M4 12.5L14 5L24 12.5V23.5H4V12.5Z" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round" />
+            <path d="M10.5 23.5V15.5H17.5V23.5" stroke="currentColor" stroke-width="1.8" />
+          </svg>
+        </span>
+        <span class="brand-text">Panduan Kos Modern</span>
+      </a>
+
+      <nav class="main-nav" aria-label="Navigasi utama">
+        <a href="#masalah-manual">Masalah Manual</a>
+        <a href="#simulasi-3d">Simulasi 3D</a>
+        <a href="#peran-saas">Peran SaaS</a>
+        <a href="#transisi">Transisi</a>
+        <a href="#baca-ringkasan">Materi Lengkap</a>
+      </nav>
+
+      <div class="header-actions">
+        <a href="#unduh-panduan" class="btn btn-accent btn-sm">Unduh Panduan</a>
+        <button
+          type="button"
+          class="menu-toggle"
+          id="menu-toggle"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label="Buka menu navigasi"
+        >
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="mobile-nav" id="mobile-nav" hidden>
+      <div class="container mobile-nav-inner">
+        <a href="#masalah-manual">Mengapa Pengelolaan Manual Kewalahan</a>
+        <a href="#simulasi-3d">Simulasi 3D Operasional Kos</a>
+        <a href="#peran-saas">Struktur Peran SaaS</a>
+        <a href="#transisi">Memulai Transisi Digital</a>
+        <a href="#baca-ringkasan">Baca Materi Lengkap</a>
+        <a href="#unduh-panduan" class="btn btn-accent">Unduh Panduan Gratis</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero" id="beranda">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="editorial-byline">Buku Panduan Praktis Pemilik &amp; Pengelola Rumah Kos</p>
+
+          <h1>Panduan Mengelola Rumah Kos Secara Modern dan Efisien</h1>
+
+          <p class="hero-lead">
+            Langkah Praktis Menata Operasional, Penagihan, Kontrak Sewa, dan Kepuasan Penghuni dengan Teknologi Digital
+          </p>
+
+          <p class="hero-context">
+            Banyak bisnis rumah kos dimulai dengan sederhana dari 5 hingga 10 kamar yang ditangani memakai buku tulis bergaris, catatan ponsel, dan WhatsApp. Ketika jumlah kamar bertambah dan pergantian penghuni lebih sering, catatan pembayaran mulai tercecer dan jadwal jatuh tempo terlewat.
+          </p>
+
+          <div class="hero-cta-row">
+            <a href="#unduh-panduan" class="btn btn-accent btn-lg">Unduh Buku Panduan &amp; Checklist</a>
+            <a href="#simulasi-3d" class="btn btn-secondary btn-lg">Jelajahi Simulasi 3D</a>
+          </div>
+
+          <dl class="hero-arch-summary" aria-label="Spesifikasi model 3D simulasi">
+            <div>
+              <dt>Model Bangunan</dt>
+              <dd class="mono-data">2 Lantai + Atap</dd>
+            </div>
+            <div>
+              <dt>Unit Simulasi</dt>
+              <dd class="mono-data">6 Kamar Kos</dd>
+            </div>
+            <div>
+              <dt>Status Terpantau</dt>
+              <dd class="mono-data">4 Kondisi Baku</dd>
+            </div>
+          </dl>
+        </div>
+
+        <div class="hero-stage-wrap" aria-label="Ilustrasi 3D Rumah Kos Interaktif">
+          <div class="viewport-shell hero-viewport-shell">
+            <canvas id="hero-kosan-canvas" aria-label="Model 3D bangunan rumah kos 2 lantai beserta kamar mandi dalam, parkiran motor, dan toren atap"></canvas>
+            <div class="pins-layer" id="hero-kosan-pins" aria-hidden="true"></div>
+
+            <div class="hero-room-toast" id="hero-room-toast" hidden>
+              <button type="button" class="toast-close" id="hero-toast-close" aria-label="Tutup detail kamar">&times;</button>
+              <div id="hero-room-toast-body"></div>
+            </div>
+          </div>
+
+          <div class="hero-stage-bar">
+            <div class="segmented-switch" role="group" aria-label="Bandingkan pola kerja manual dan digital">
+              <button type="button" class="seg-btn" data-hero-mode="manual" aria-pressed="false">Pola Kerja Manual</button>
+              <button type="button" class="seg-btn is-active" data-hero-mode="digital" aria-pressed="true">Alur Kerja Digital</button>
+            </div>
+
+            <div class="hero-stage-actions">
+              <button type="button" class="text-action-btn" id="hero-lighting-btn" aria-pressed="false">Mode Malam</button>
+              <button type="button" class="text-action-btn" id="hero-roof-btn" aria-pressed="false">Atap Utuh</button>
+              <button type="button" class="text-action-btn" id="hero-reset-cam">Reset Kamera</button>
+            </div>
+          </div>
+
+          <p class="hero-stage-caption" id="hero-mode-note">
+            <strong>Alur Kerja Digital:</strong> Seret model 3D rumah kos untuk memutar 360 derajat atau klik langsung salah satu kamar untuk membaca status terkini.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 1: MENGAPA PENGELOLAAN MANUAL MULAI KEWALAHAN -->
+    <section class="section section-surface" id="masalah-manual">
+      <div class="container">
+        <div class="section-header-split">
+          <div>
+            <span class="chapter-index">Bagian 01</span>
+            <h2>Mengapa Pengelolaan Manual Mulai Kewalahan</h2>
+          </div>
+          <p class="section-intro">
+            Masalah terbesar dalam pengelolaan kos tradisional bukan terletak pada kurangnya niat baik pengelola, melainkan pada sistem pencatatan yang terpisah-pisah antara ingatan, kertas, galeri ponsel, dan pesan singkat.
+          </p>
+        </div>
+
+        <div class="manual-layout">
+          <div class="manual-diagnostic-panel">
+            <h3>Pencatatan yang Terpisah-pisah</h3>
+            <p class="panel-sub">
+              Ketika pekerjaan administratif menyita waktu dan energi, pertanyaan paling mendasar tentang usaha kos sendiri justru sulit dijawab secara cepat.
+            </p>
+
+            <ul class="clean-list">
+              <li>
+                <strong>Data kamar di kepala atau papan tulis:</strong> Ketersediaan kamar sering tidak mutakhir saat calon penghuni bertanya mendadak.
+              </li>
+              <li>
+                <strong>Data penghuni di galeri foto ponsel:</strong> Foto kartu identitas dan bukti pembayaran tertimbun ribuan pesan harian lain.
+              </li>
+              <li>
+                <strong>Tagihan lewat pesan pribadi:</strong> Jadwal jatuh tempo mudah terlewat dan pemilik merasa sungkan menagih berulang kali.
+              </li>
+              <li>
+                <strong>Pengeluaran di bon kertas:</strong> Catatan perawatan kecil sulit direkap bersama uang sewa karena rekening masih bercampur.
+              </li>
+            </ul>
+
+            <blockquote class="editorial-quote">
+              "Berapa sebenarnya pemasukan bersih bulan ini dan kamar mana saja yang masih menunggak?"
+            </blockquote>
+          </div>
+
+          <div class="leaks-list">
+            <article class="leak-row">
+              <span class="row-num">01</span>
+              <div class="leak-content">
+                <h3>Keterlambatan Penagihan dan Rasa Sungkan</h3>
+                <p>
+                  Tanpa pengingat yang teratur, penghuni bisa lupa membayar karena kesibukan kuliah atau kerja, sementara pengelola kerap merasa sungkan menagih berulang kali secara personal.
+                </p>
+                <button type="button" class="inline-preview-btn" data-jump-step="3">Lihat solusi penagihan di model 3D</button>
+              </div>
+            </article>
+
+            <article class="leak-row">
+              <span class="row-num">02</span>
+              <div class="leak-content">
+                <h3>Informasi Ketersediaan Kamar Tidak Akurat</h3>
+                <p>
+                  Calon penghuni mendapat jawaban yang lambat atau keliru karena pengelola masih harus membuka catatan lama atau menelepon penjaga kos terlebih dahulu.
+                </p>
+                <button type="button" class="inline-preview-btn" data-jump-step="1">Lihat pencatatan status kamar di 3D</button>
+              </div>
+            </article>
+
+            <article class="leak-row">
+              <span class="row-num">03</span>
+              <div class="leak-content">
+                <h3>Keluhan Kerusakan Fasilitas Terselip di Pesan</h3>
+                <p>
+                  Laporan keran air bocor, pendingin ruangan kurang dingin, atau internet terputus tertimbun ratusan pesan masuk sehingga penanganannya tertunda dan membuat penghuni tidak betah.
+                </p>
+                <button type="button" class="inline-preview-btn" data-jump-step="4">Lihat alur penanganan keluhan di 3D</button>
+              </div>
+            </article>
+
+            <p class="solution-line">
+              <strong>Jalan keluarnya:</strong> Bukan dengan bekerja lebih keras memakai cara lama, melainkan memindahkan rutinitas tersebut ke <strong>satu alur kerja digital yang rapi</strong>.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: SIMULASI 3D OPERASIONAL RUMAH KOS MODERN -->
+    <section class="section" id="simulasi-3d">
+      <div class="container">
+        <div class="section-header-split">
+          <div>
+            <span class="chapter-index">Bagian 02</span>
+            <h2>Simulasi 3D Operasional Rumah Kos Modern</h2>
+          </div>
+          <p class="section-intro">
+            Pelajari kelima langkah inti dari buku panduan sambil menguji langsung simulasinya pada diorama Kos Griya Asri (Data Simulasi Model 3D: 6 Kamar).
+          </p>
+        </div>
+
+        <div class="mobile-step-tabs" role="tablist" aria-label="Pilih bab simulasi operasional kos 3D">
+          <button type="button" class="step-tab-btn is-active" data-step-tab="1" role="tab" aria-selected="true">01 Data Kamar</button>
+          <button type="button" class="step-tab-btn" data-step-tab="2" role="tab" aria-selected="false">02 Kontrak Digital</button>
+          <button type="button" class="step-tab-btn" data-step-tab="3" role="tab" aria-selected="false">03 Penagihan</button>
+          <button type="button" class="step-tab-btn" data-step-tab="4" role="tab" aria-selected="false">04 Pengaduan</button>
+          <button type="button" class="step-tab-btn" data-step-tab="5" role="tab" aria-selected="false">05 Keuangan</button>
+        </div>
+
+        <div class="walkthrough-grid">
+          <div class="steps-column" id="steps-column">
+            <!-- Chapter 1 -->
+            <article class="step-item is-active" data-step="1" id="step-card-1">
+              <button type="button" class="step-trigger" data-select-step="1" aria-expanded="true">
+                <span class="step-num">01</span>
+                <span class="step-title-col">
+                  <span class="step-subtitle">Basis Data Properti Terpusat</span>
+                  <strong>Menata Data Kamar, Penghuni, dan Pemesanan dalam Satu Tempat</strong>
+                </span>
+              </button>
+
+              <div class="step-body">
+                <p>
+                  Langkah pertama menuju pengelolaan kos yang modern adalah menyatukan seluruh informasi dasar properti ke dalam satu basis data yang selalu mutakhir. Setiap kamar wajib memiliki identitas jelas: nomor kamar, tipe, harga sewa, daftar fasilitas, dan empat status terkini: <strong>Terisi</strong>, <strong>Kosong siap huni</strong>, <strong>Dalam tahap pemesanan</strong>, atau <strong>Sedang diperbaiki</strong>.
+                </p>
+                <p>
+                  Saat seorang calon penghuni menanyakan kamar ber-AC yang kosong bulan depan pada siang hari, Anda cukup melihat status kamar langsung dari dasbor Admin Kos, memeriksa akhir masa sewa sebelumnya, lalu mencatat pemesanan baru tanpa risiko kamar terjual ganda. Data penghuni seperti nama lengkap, kontak darurat, identitas diri, tanggal masuk, dan riwayat kamar juga tersimpan aman terpisah dari pengelola kos lain.
+                </p>
+
+                <div class="step-action-row">
+                  <button type="button" class="btn btn-accent btn-sm" id="sim-book-k102">Simulasi: Catat Pemesanan K-102 (AC)</button>
+                  <span class="sim-feedback" id="feedback-step-1">Klik K-102 pada model 3D atau tekan tombol untuk melihat status berubah seketika.</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Chapter 2 -->
+            <article class="step-item" data-step="2" id="step-card-2">
+              <button type="button" class="step-trigger" data-select-step="2" aria-expanded="false">
+                <span class="step-num">02</span>
+                <span class="step-title-col">
+                  <span class="step-subtitle">Transparansi Sejak Hari Pertama</span>
+                  <strong>Membangun Kejelasan Lewat Kontrak Sewa Digital</strong>
+                </span>
+              </button>
+
+              <div class="step-body">
+                <p>
+                  Kesepakatan sewa yang hanya disampaikan secara lisan atau melalui pesan singkat sering memicu perdebatan saat penghuni hendak pindah keluar, mulai dari biaya listrik, aturan membawa tamu, denda keterlambatan, hingga pengembalian uang jaminan.
+                </p>
+                <p>
+                  Kontrak sewa digital memastikan seluruh ketentuan sewa, durasi tinggal, nominal pembayaran, dan tata tertib rumah kos tersimpan rapi tanpa risiko kertas hilang atau rusak.
+                </p>
+
+                <div class="doc-callout">
+                  <div class="doc-callout-title">Tips Praktis Serah Terima Kamar</div>
+                  <p>
+                    Biasakan proses serah terima kamar selalu disertai konfirmasi kontrak digital sebelum kunci diserahkan. Dengan begitu, penghuni memahami hak dan kewajibannya sejak hari pertama. Di dalam sistem manajemen rumah kos berbasis SaaS, dokumen kontrak sewa digital dapat dikelola oleh Admin Kos dan dilihat kembali kapan saja oleh Penghuni Kos melalui akun mereka.
+                  </p>
+                </div>
+
+                <div class="step-action-row">
+                  <button type="button" class="btn btn-accent btn-sm" id="sim-contract-k201">Konfirmasi Kontrak &amp; Serah Kunci (K-201)</button>
+                  <span class="sim-feedback" id="feedback-step-2">Atau klik dokumen kontrak 3D di atas Kamar K-201.</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Chapter 3 -->
+            <article class="step-item" data-step="3" id="step-card-3">
+              <button type="button" class="step-trigger" data-select-step="3" aria-expanded="false">
+                <span class="step-num">03</span>
+                <span class="step-title-col">
+                  <span class="step-subtitle">Prosedur Penagihan Objektif</span>
+                  <strong>Menagih Lebih Profesional dan Menghindari Tunggakan</strong>
+                </span>
+              </button>
+
+              <div class="step-body">
+                <p>
+                  Bagi banyak pemilik kos, menagih uang sewa kepada penghuni yang sudah dikenal baik terasa canggung. Cara terbaik menghilangkannya adalah menetapkan siklus jatuh tempo yang jelas, rincian tagihan yang transparan, dan opsi pembayaran digital seperti QRIS atau transfer bank yang tercatat statusnya otomatis.
+                </p>
+                <p>
+                  Penghuni dapat memantau status tagihan dan riwayat pembayaran dari halaman Penghuni Kos, sementara Admin Kos melihat daftar tagihan <strong>Lunas</strong>, <strong>Menunggu Pembayaran</strong>, atau <strong>Melewati Jatuh Tempo</strong> dalam satu tampilan bersih tanpa memeriksa mutasi rekening secara manual.
+                </p>
+
+                <div class="doc-callout">
+                  <div class="doc-callout-title">Prinsip Penagihan Tanpa Canggung</div>
+                  <p>
+                    Pisahkan hubungan personal dari prosedur penagihan dengan memanfaatkan pengingat jatuh tempo otomatis serta opsi pembayaran digital (QRIS/transfer bank). Pengingat sistematis dipahami sebagai pengingat resmi manajemen kos, bukan teguran personal dari pemilik.
+                  </p>
+                </div>
+
+                <div class="step-action-row">
+                  <button type="button" class="btn btn-secondary btn-sm" id="sim-remind-k202">Kirim Pengingat H-2</button>
+                  <button type="button" class="btn btn-accent btn-sm" id="sim-pay-k202">Simulasi Bayar QRIS (K-202)</button>
+                  <span class="sim-feedback" id="feedback-step-3">Klik papan QRIS 3D di atas K-202 untuk melunasi tagihan simulasi.</span>
+                </div>
+              </div>
+            </article>
+
+            <!-- Chapter 4 -->
+            <article class="step-item" data-step="4" id="step-card-4">
+              <button type="button" class="step-trigger" data-select-step="4" aria-expanded="false">
+                <span class="step-num">04</span>
+                <span class="step-title-col">
+                  <span class="step-subtitle">Layanan &amp; Riwayat Perawatan</span>
+                  <strong>Menangani Pengaduan Penghuni Secara Terukur</strong>
+                </span>
+              </button>
+
+              <div class="step-body">
+                <p>
+                  Keran air yang bocor, pendingin ruangan kurang dingin, atau koneksi internet terputus adalah hal wajar dalam operasional bangunan. Yang menentukan kepuasan penghuni adalah kecepatan dan kejelasan respons pengelola.
+                </p>
+                <p>
+                  Dengan satu jalur pencatatan pengaduan resmi, penghuni merasa tenang karena tahu laporannya sudah diterima, sementara Admin Kos memiliki riwayat perawatan per kamar untuk mengevaluasi kamar mana yang paling sering membutuhkan perbaikan.
+                </p>
+
+                <div class="doc-callout">
+                  <div class="doc-callout-title">Alur Penanganan Keluhan yang Ideal</div>
+                  <p>
+                    <strong>Dilaporkan oleh Penghuni &rarr; Diproses oleh Admin Kos &rarr; Selesai &amp; Terdokumentasi.</strong> Dengan alur status yang jelas, penghuni merasa tenang karena kendala sedang ditangani, sementara pengelola memiliki catatan perawatan kamar yang terukur.
+                  </p>
+                </div>
+
+                <div class="complaint-flow-pills" role="group" aria-label="Uji alur 3 status pengaduan Kamar K-103">
+                  <button type="button" class="flow-stage-btn is-current" data-complaint-stage="reported">1. Dilaporkan Penghuni</button>
+                  <button type="button" class="flow-stage-btn" data-complaint-stage="processing">2. Diproses Admin Kos</button>
+                  <button type="button" class="flow-stage-btn" data-complaint-stage="done">3. Selesai &amp; Terdokumentasi</button>
+                </div>
+                <span class="sim-feedback" id="feedback-step-4">Amati tetesan air di wastafel Kamar K-103 pada model 3D, lalu ubah tahap penanganannya.</span>
+              </div>
+            </article>
+
+            <!-- Chapter 5 -->
+            <article class="step-item" data-step="5" id="step-card-5">
+              <button type="button" class="step-trigger" data-select-step="5" aria-expanded="false">
+                <span class="step-num">05</span>
+                <span class="step-title-col">
+                  <span class="step-subtitle">Arus Kas &amp; Keterisian Nyata</span>
+                  <strong>Membaca Kesehatan Bisnis Lewat Laporan Keuangan yang Rapi</strong>
+                </span>
+              </button>
+
+              <div class="step-body">
+                <p>
+                  Bisnis kos yang hampir semua kamarnya terisi sering kali tetap membingungkan di akhir tahun jika uang sewa bercampur dengan rekening pribadi dan biaya perawatan kecil, iuran lingkungan, kebersihan, serta perbaikan mendadak tidak dicatat disiplin.
+                </p>
+                <p>
+                  Saat pemesanan, tagihan, dan pembayaran berjalan di satu sistem digital, transaksi terverifikasi otomatis terangkum menjadi laporan arus kas bersih, statistik hunian bulanan, dan dasar perencanaan dana cadangan renovasi atau penyesuaian tarif sewa berdasarkan angka nyata.
+                </p>
+
+                <div class="ledger-box">
+                  <div class="ledger-caption">Data Simulasi Model 3D (6 Kamar Kos Griya Asri)</div>
+                  <div class="ledger-summary" aria-live="polite">
+                    <div>
+                      <span>Pemasukan Terverifikasi</span>
+                      <strong id="metric-income">Rp 3.200.000</strong>
+                    </div>
+                    <div>
+                      <span>Tagihan Menunggu</span>
+                      <strong id="metric-pending">Rp 1.950.000</strong>
+                    </div>
+                    <div>
+                      <span>Biaya Operasional</span>
+                      <strong id="metric-expense">Rp 1.400.000</strong>
+                    </div>
+                    <div class="ledger-net">
+                      <span>Arus Kas Bersih</span>
+                      <strong id="metric-net">Rp 1.800.000</strong>
+                    </div>
+                  </div>
+
+                  <div class="occupancy-line">
+                    <span>Tingkat Keterisian (Sinkron Model 3D): <strong id="metric-occupancy">50% (3/6 Kamar)</strong></span>
+                    <div class="occupancy-track">
+                      <div class="occupancy-fill" id="metric-occupancy-fill" style="width: 50%"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </div>
+
+          <!-- RIGHT COLUMN: STICKY 3D STUDIO VIEWPORT -->
+          <aside class="walkthrough-stage" aria-label="Viewport Model 3D Kosan">
+            <div class="studio-frame">
+              <div class="viewport-shell studio-viewport-shell">
+                <canvas id="studio-kosan-canvas" aria-label="Diorama 3D Kos Griya Asri interaktif"></canvas>
+                <div class="pins-layer" id="studio-kosan-pins" aria-hidden="true"></div>
+
+                <div class="studio-hud-top">
+                  <span class="hud-step-num" id="hud-step-num">BAB 01</span>
+                  <span class="hud-step-label" id="hud-step-title">Data Kamar, Penghuni, &amp; Pemesanan</span>
+                </div>
+
+                <div class="studio-hud-bottom">
+                  <div class="floor-filter-group" role="group" aria-label="Filter lantai bangunan 3D">
+                    <button type="button" class="floor-btn is-active" data-floor="all">Semua</button>
+                    <button type="button" class="floor-btn" data-floor="1">Lantai 1</button>
+                    <button type="button" class="floor-btn" data-floor="2">Lantai 2</button>
+                    <button type="button" class="floor-btn" data-floor="roof">Atap &amp; Toren</button>
+                  </div>
+
+                  <div class="hud-icon-group">
+                    <button type="button" class="chip-btn" id="studio-lighting-btn" aria-pressed="false">Malam</button>
+                    <button type="button" class="icon-btn" id="studio-rot-left" aria-label="Putar bangunan ke kiri">&#8634;</button>
+                    <button type="button" class="icon-btn" id="studio-rot-right" aria-label="Putar bangunan ke kanan">&#8635;</button>
+                    <button type="button" class="icon-btn" id="studio-zoom-out" aria-label="Perkecil tampilan">&minus;</button>
+                    <button type="button" class="icon-btn" id="studio-zoom-in" aria-label="Perbesar tampilan">+</button>
+                    <button type="button" class="chip-btn" id="studio-reset-cam">Reset</button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Status Filter & Room Inspector Strip (Includes Empty State per R-27) -->
+              <div class="inspector-strip" id="room-inspector" aria-live="polite">
+                <div class="inspector-filter-bar" role="group" aria-label="Saring kamar berdasarkan 4 status">
+                  <button type="button" class="status-filter-btn is-active" data-status-filter="all">Semua (6)</button>
+                  <button type="button" class="status-filter-btn" data-status-filter="occupied">Terisi</button>
+                  <button type="button" class="status-filter-btn" data-status-filter="ready">Siap Huni</button>
+                  <button type="button" class="status-filter-btn" data-status-filter="booked">Dipesan</button>
+                  <button type="button" class="status-filter-btn" data-status-filter="repair">Perbaikan</button>
+                </div>
+
+                <div class="inspector-empty-state" id="inspector-empty-state" hidden>
+                  <strong>Tidak ada kamar pada status ini</strong>
+                  <p id="inspector-empty-msg">Belum ada kamar yang cocok dengan filter status saat ini.</p>
+                  <button type="button" class="text-action-btn text-action-accent" id="inspector-clear-filter">Tampilkan semua kamar</button>
+                </div>
+
+                <div id="inspector-detail-wrap">
+                  <div class="inspector-strip-head">
+                    <div>
+                      <span class="mono-data inspector-code" id="insp-code">KAMAR K-102 · LANTAI 1</span>
+                      <strong id="insp-title">Tipe AC · Siap Huni</strong>
+                    </div>
+                    <div class="inspector-strip-right">
+                      <button type="button" class="text-action-btn" id="insp-focus-btn">Fokus Kamera</button>
+                      <span class="status-badge status-ready" id="insp-status">Kosong siap huni</span>
+                    </div>
+                  </div>
+
+                  <div class="inspector-meta-line">
+                    <span class="mono-data" id="insp-price">Rp 1.850.000 / bln</span>
+                    <span class="meta-sep" aria-hidden="true">&middot;</span>
+                    <span id="insp-tenant">Belum ada penghuni</span>
+                    <span class="meta-sep" aria-hidden="true">&middot;</span>
+                    <span id="insp-billing">Tersedia untuk pemesanan baru</span>
+                  </div>
+                  <p class="inspector-note" id="insp-note">
+                    Fasilitas: AC, Kasur Queen, Meja Kerja, Lemari, Wi-Fi, Kamar Mandi Dalam.
+                  </p>
+                </div>
+              </div>
+
+              <div class="studio-nav-footer">
+                <button type="button" class="text-action-btn" id="step-prev-btn" disabled>&larr; Sebelumnya</button>
+                <span class="step-counter mono-data" id="step-counter">Bab 1 / 5</span>
+                <button type="button" class="text-action-btn text-action-accent" id="step-next-btn">Berikutnya &rarr;</button>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: PERAN PENGGUNA SAAS & TRANSISI BERTAHAP -->
+    <section class="section section-surface" id="peran-saas">
+      <div class="container">
+        <div class="section-header-split">
+          <div>
+            <span class="chapter-index">Bagian 03</span>
+            <h2>Tiga Peran Pengguna dalam Sistem Manajemen Rumah Kos</h2>
+          </div>
+          <p class="section-intro">
+            Sebagai solusi berbasis SaaS, Sistem Informasi Manajemen Rumah Kos memisahkan ruang data setiap pengelola secara aman agar privasi properti dan penghuni tidak pernah bercampur.
+          </p>
+        </div>
+
+        <div class="roles-explorer">
+          <div class="role-tabs" role="tablist" aria-label="Pilih peran pengguna sistem">
+            <button type="button" class="role-tab is-active" data-role="admin" role="tab" aria-selected="true">Admin Kos</button>
+            <button type="button" class="role-tab" data-role="penghuni" role="tab" aria-selected="false">Penghuni Kos</button>
+            <button type="button" class="role-tab" data-role="superadmin" role="tab" aria-selected="false">Super Admin</button>
+          </div>
+
+          <div class="role-panel" id="role-detail-panel" aria-live="polite">
+            <div class="role-panel-head">
+              <h3 id="role-title">Admin Kos: Pengendali Penuh Operasional Properti</h3>
+              <span class="role-scope-tag mono-data" id="role-scope">Ruang Data Terpisah &amp; Aman</span>
+            </div>
+            <p id="role-desc">
+              Mengelola kamar, data penghuni, pemesanan, kontrak sewa digital, tagihan, pembayaran, pengaduan, dan laporan keuangan di ruang data yang terpisah dan aman.
+            </p>
+            <ul class="role-capabilities" id="role-capabilities">
+              <li>Memperbarui empat status kamar serta mencatat pemesanan masuk tanpa risiko terjual ganda</li>
+              <li>Menyimpan identitas diri, kontak darurat, riwayat kamar, dan kontrak sewa digital penghuni</li>
+              <li>Mengatur pengingat jatuh tempo otomatis serta memantau pembayaran QRIS dan transfer bank</li>
+              <li>Memperbarui progres pengaduan penghuni dan membaca laporan keuangan bersih kapan saja</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="table-wrap" aria-label="Tabel Peran Pengguna dan Fokus Utama Sistem">
+          <table class="roles-table">
+            <thead>
+              <tr>
+                <th scope="col">Peran Pengguna</th>
+                <th scope="col">Fokus Utama &amp; Akses</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Super Admin</strong></td>
+                <td>Menjaga keandalan infrastruktur platform SaaS, mengelola akun Admin Kos, dan memantau sistem secara terpusat.</td>
+              </tr>
+              <tr>
+                <td><strong>Admin Kos</strong></td>
+                <td>Mengelola kamar, data penghuni, pemesanan, kontrak sewa digital, tagihan, pembayaran, pengaduan, dan laporan keuangan di ruang data yang terpisah dan aman.</td>
+              </tr>
+              <tr>
+                <td><strong>Penghuni Kos</strong></td>
+                <td>Mengakses informasi kamar, melihat kontrak sewa digital, memantau tagihan dan riwayat pembayaran, serta mengirim laporan pengaduan.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: MEMULAI TRANSISI DIGITAL -->
+    <section class="section" id="transisi">
+      <div class="container">
+        <div class="section-header-split">
+          <div>
+            <span class="chapter-index">Bagian 04</span>
+            <h2>Memulai Transisi Digital di Rumah Kos Anda</h2>
+          </div>
+          <p class="section-intro">
+            Beralih dari pencatatan manual ke sistem digital tidak harus dilakukan secara tergesa-gesa dalam satu malam. Mulailah secara bertahap dari data yang aktif hari ini.
+          </p>
+        </div>
+
+        <ol class="transition-steps">
+          <li>
+            <span class="tl-num mono-data">Tahap 01</span>
+            <div>
+              <h3>Rapikan Data Kamar dan Penghuni yang Sedang Aktif</h3>
+              <p>
+                Pastikan setiap kamar sudah memiliki tarif sewa serta status yang benar, lalu lengkapi data penghuni aktif beserta tanggal jatuh tempo sewa mereka masing-masing.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num mono-data">Tahap 02</span>
+            <div>
+              <h3>Biasakan Satu Alur Kerja Harian di Platform</h3>
+              <p>
+                Setelah fondasi data masuk ke dalam sistem, biasakan pencatatan pemesanan baru, konfirmasi kontrak sewa digital sebelum serah kunci, penagihan bulanan, serta penanganan keluhan melalui platform yang sama.
+              </p>
+            </div>
+          </li>
+          <li>
+            <span class="tl-num mono-data">Tahap 03</span>
+            <div>
+              <h3>Rasakan Perbedaannya dalam 1 hingga 2 Siklus Penagihan</h3>
+              <p>
+                Waktu yang dihabiskan untuk mengecek catatan berkurang drastis, komunikasi dengan penghuni menjadi lebih tertib, dan kondisi keuangan kos jauh lebih mudah dipantau.
+              </p>
+            </div>
+          </li>
+        </ol>
+
+        <blockquote class="closing-quote">
+          "Mengelola rumah kos yang teratur bukan soal seberapa besar bangunan yang Anda miliki hari ini, melainkan seberapa siap sistem kerja Anda menopang pertumbuhan di masa depan."
+        </blockquote>
+      </div>
+    </section>
+
+    <!-- SECTION 5: BACA MATERI LENGKAP & UNDUH PANDUAN -->
+    <section class="section section-surface" id="unduh-panduan">
+      <div class="container lead-grid">
+        <div class="book-showcase" id="baca-ringkasan">
+          <div class="book-3d-wrapper">
+            <div class="book-3d" aria-hidden="true">
+              <div class="book-spine"></div>
+              <div class="book-pages"></div>
+              <div class="book-cover">
+                <span class="book-tag mono-data">BUKU PANDUAN PRAKTIS</span>
+                <h3>Panduan Mengelola Rumah Kos Secara Modern dan Efisien</h3>
+                <p>Operasional, Kontrak Sewa Digital, Penagihan, Pengaduan Penghuni, dan Laporan Keuangan</p>
+                <span class="book-footer-tag mono-data">Edisi Pemilik &amp; Pengelola Kos</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="book-toc">
+            <h4>Daftar Pembahasan Lengkap di Dalam Panduan:</h4>
+            <ol>
+              <li>Mengapa Pengelolaan Manual Mulai Kewalahan (3 Kebocoran Utama)</li>
+              <li>Menata Data Kamar (4 Status Baku), Penghuni, dan Pemesanan</li>
+              <li>Membangun Kejelasan Lewat Kontrak Sewa Digital &amp; Serah Terima Kunci</li>
+              <li>Menagih Lebih Profesional Tanpa Canggung dengan QRIS &amp; Pengingat Otomatis</li>
+              <li>Menangani Pengaduan Penghuni Melalui Alur 3 Status Terukur</li>
+              <li>Membaca Kesehatan Bisnis Lewat Laporan Keuangan &amp; Dana Cadangan</li>
+              <li>Memulai Transisi Digital Bertahap &amp; Pembagian 3 Peran Sistem SaaS</li>
+            </ol>
+
+            <button type="button" class="btn btn-secondary btn-sm" id="open-reader-btn">
+              Baca Naskah Lengkap Panduan di Layar
+            </button>
+          </div>
+        </div>
+
+        <div class="lead-form-card">
+          <span class="chapter-index">Lead Magnet Gratis</span>
+          <h2>Unduh Buku Panduan &amp; Checklist Transisi Kos</h2>
+          <p class="form-intro">
+            Isi data singkat di bawah ini untuk langsung mengunduh naskah lengkap panduan beserta checklist operasional praktis dalam format teks atau mencetaknya ke PDF.
+          </p>
+
+          <form id="lead-magnet-form" novalidate>
+            <div class="form-field">
+              <label for="lead-name">Nama Pemilik atau Pengelola Kos</label>
+              <input
+                type="text"
+                id="lead-name"
+                name="name"
+                placeholder="Contoh: Ibu Ratna atau Pak Hendra"
+                required
+                autocomplete="name"
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="lead-contact">Email atau Nomor WhatsApp</label>
+              <input
+                type="text"
+                id="lead-contact"
+                name="contact"
+                placeholder="nama@email.com atau 0812xxxxxxxx"
+                required
+              />
+            </div>
+
+            <div class="form-field">
+              <label for="lead-rooms">Jumlah Kamar Kos Saat Ini</label>
+              <select id="lead-rooms" name="rooms" required>
+                <option value="5-10">5 hingga 10 Kamar</option>
+                <option value="11-25">11 hingga 25 Kamar</option>
+                <option value="26-50">26 hingga 50 Kamar</option>
+                <option value="50+">Lebih dari 50 Kamar</option>
+              </select>
+            </div>
+
+            <p class="form-error" id="lead-form-error" role="alert" hidden></p>
+
+            <button type="submit" class="btn btn-accent btn-lg btn-block" id="lead-submit-btn">
+              Siapkan Unduhan Panduan Gratis
+            </button>
+          </form>
+
+          <div class="lead-loading-box" id="lead-loading-box" hidden aria-live="polite">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>Menyusun dokumen panduan lengkap dan checklist sesuai skala kamar kos Anda...</p>
+          </div>
+
+          <div class="lead-success-box" id="lead-success-box" hidden aria-live="polite">
+            <div class="success-check" aria-hidden="true">&#10003;</div>
+            <h3>Panduan dan Checklist Siap Diunduh</h3>
+            <p id="lead-success-msg"></p>
+            <div class="success-actions">
+              <button type="button" class="btn btn-accent" id="download-checklist-btn">Unduh Naskah &amp; Checklist (.txt)</button>
+              <button type="button" class="btn btn-secondary" id="print-guide-btn">Cetak atau Simpan PDF</button>
+            </div>
+            <button type="button" class="text-reset-btn" id="reset-form-btn">Ubah data pengelola</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ACCESSIBLE FULL GUIDE READER MODAL -->
+  <div class="modal-backdrop" id="reader-modal" hidden role="dialog" aria-modal="true" aria-labelledby="reader-modal-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="chapter-index">Naskah Lengkap Buku Panduan</span>
+          <h2 id="reader-modal-title">Panduan Mengelola Rumah Kos Secara Modern dan Efisien</h2>
+        </div>
+        <button type="button" class="modal-close-btn" id="close-reader-btn" aria-label="Tutup jendela baca panduan">&times;</button>
+      </div>
+      <div class="modal-body" id="reader-modal-body" tabindex="0">
+        <!-- Populated cleanly from source content in script.js -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="reader-print-btn">Cetak / Simpan PDF</button>
+        <button type="button" class="btn btn-accent btn-sm" id="reader-close-footer-btn">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <strong>Panduan Mengelola Rumah Kos Secara Modern dan Efisien</strong>
+        <p>Langkah praktis menata operasional, penagihan, kontrak sewa, dan kepuasan penghuni dengan teknologi digital.</p>
+      </div>
+      <div class="footer-links">
+        <a href="#masalah-manual">Masalah Manual</a>
+        <a href="#simulasi-3d">Simulasi 3D</a>
+        <a href="#peran-saas">Peran SaaS</a>
+        <a href="#transisi">Transisi</a>
+        <a href="#unduh-panduan">Unduh Panduan</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
